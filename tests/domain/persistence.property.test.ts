@@ -20,6 +20,10 @@ const petStateArb: fc.Arbitrary<PetState> = fc.record({
     feedRemainingMs: msArb,
     playRemainingMs: msArb,
   }),
+  graces: fc.record({
+    hungerGraceRemainingMs: msArb,
+    happinessGraceRemainingMs: msArb,
+  }),
 });
 
 describe("property: save/load round-trip", () => {

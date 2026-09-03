@@ -7,5 +7,6 @@ export function createNewPet(): PetState {
     isResting: false,
     restRemainingMs: 0,
     cooldowns: { feedRemainingMs: 0, playRemainingMs: 0 },
+    graces: { hungerGraceRemainingMs: 0, happinessGraceRemainingMs: 0 },
   };
 }

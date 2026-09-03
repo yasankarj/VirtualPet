@@ -10,11 +10,17 @@ export interface ActionCooldowns {
   playRemainingMs: number;
 }
 
+export interface DecayGraces {
+  hungerGraceRemainingMs: number;
+  happinessGraceRemainingMs: number;
+}
+
 export interface PetState {
   stats: PetStats;
   isResting: boolean;
   restRemainingMs: number;
   cooldowns: ActionCooldowns;
+  graces: DecayGraces;
 }
 
 export type MoodState = "HAPPY" | "NEUTRAL" | "HUNGRY" | "TIRED" | "SAD" | "SICK";

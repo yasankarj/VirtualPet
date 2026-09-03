@@ -8,13 +8,17 @@ import { applyFeed, applyPlay, applyRest, computeMood, tick } from "./domain/rul
 
 function App() {
   const [petState, setPetState] = useState(() => loadState());
+  // Bumped by every player action to restart the tick timer below (Decay Pacing FR-DP1):
+  // guarantees the next tick always lands a full TICK_INTERVAL_MS after the most recent action.
+  const [tickEpoch, setTickEpoch] = useState(0);
+  const restartTickClock = () => setTickEpoch((epoch) => epoch + 1);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setPetState((current) => tick(current));
     }, TICK_INTERVAL_MS);
     return () => clearInterval(intervalId);
-  }, []);
+  }, [tickEpoch]);
 
   useEffect(() => {
     saveState(petState);
@@ -33,9 +37,18 @@ function App() {
         <StatBar label="Health" value={petState.stats.health} isDetrimental={false} />
       </div>
       <ActionPanel
-        onFeed={() => setPetState((current) => applyFeed(current))}
-        onPlay={() => setPetState((current) => applyPlay(current))}
-        onRest={() => setPetState((current) => applyRest(current))}
+        onFeed={() => {
+          setPetState((current) => applyFeed(current));
+          restartTickClock();
+        }}
+        onPlay={() => {
+          setPetState((current) => applyPlay(current));
+          restartTickClock();
+        }}
+        onRest={() => {
+          setPetState((current) => applyRest(current));
+          restartTickClock();
+        }}
         feedRemainingMs={petState.cooldowns.feedRemainingMs}
         playRemainingMs={petState.cooldowns.playRemainingMs}
         isResting={petState.isResting}

@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import App from "../src/App";
-import { NEW_PET_STARTING_STATS } from "../src/domain/constants";
+import { FEED_HUNGER_DELTA, NEW_PET_STARTING_STATS } from "../src/domain/constants";
 
 describe("App", () => {
   beforeEach(() => {
@@ -23,7 +23,7 @@ describe("App", () => {
     render(<App />);
     await userEvent.click(screen.getByTestId("action-panel-feed-button"));
     expect(screen.getByTestId("stat-bar-Hunger")).toHaveTextContent(
-      `Hunger: ${Math.max(0, NEW_PET_STARTING_STATS.hunger - 15)}`,
+      `Hunger: ${Math.max(0, NEW_PET_STARTING_STATS.hunger + FEED_HUNGER_DELTA)}`,
     );
   });
 });

@@ -18,6 +18,14 @@ Tracked as **remaining milliseconds**, not absolute timestamps — this keeps be
 | `feedRemainingMs` | number >= 0 | Time left before Feed can be used again (0 = ready) |
 | `playRemainingMs` | number >= 0 | Time left before Play can be used again (0 = ready) |
 
+## DecayGraces (new — Decay Pacing FR-DP2/FR-DP3)
+Same "remaining milliseconds" pattern as `ActionCooldowns`, for the same closed-app-consistency reason. While a grace value is > 0, the Decay Rule skips passive decay for that stat (see `business-rules.md`).
+
+| Field | Type | Meaning |
+|---|---|---|
+| `hungerGraceRemainingMs` | number >= 0 | Time left before Hunger resumes passive decay after a Feed (0 = decaying normally) |
+| `happinessGraceRemainingMs` | number >= 0 | Time left before Happiness resumes passive decay after a Play (0 = decaying normally) |
+
 ## PetState (root entity, persisted)
 | Field | Type | Meaning |
 |---|---|---|
@@ -25,6 +33,7 @@ Tracked as **remaining milliseconds**, not absolute timestamps — this keeps be
 | `isResting` | boolean | Whether the pet is currently in the Resting state (FR3) |
 | `restRemainingMs` | number >= 0 | Time left in the Resting state (0 when not resting) |
 | `cooldowns` | ActionCooldowns | Feed/Play cooldown state |
+| `graces` | DecayGraces | Hunger/Happiness post-action decay-grace state (Decay Pacing) |
 
 ## MoodState (derived, not persisted — recomputed from PetState on every render)
 Enum: `HAPPY | NEUTRAL | HUNGRY | TIRED | SAD | SICK`
@@ -32,15 +41,16 @@ Enum: `HAPPY | NEUTRAL | HUNGRY | TIRED | SAD | SICK`
 Used to select the mood image and label (FR7). See `business-rules.md` for the priority order used to compute this from `PetStats`.
 
 ## Persisted Shape (localStorage)
-Key: `virtualPet.state.v1`
+Key: `virtualPet.state.v2` (bumped from `.v1` by Decay Pacing — shape gained the `graces` field)
 
 ```json
 {
   "stats": { "hunger": 10, "happiness": 80, "energy": 80, "health": 100 },
   "isResting": false,
   "restRemainingMs": 0,
-  "cooldowns": { "feedRemainingMs": 0, "playRemainingMs": 0 }
+  "cooldowns": { "feedRemainingMs": 0, "playRemainingMs": 0 },
+  "graces": { "hungerGraceRemainingMs": 0, "happinessGraceRemainingMs": 0 }
 }
 ```
 
-**Versioned key** (`.v1` suffix): if the shape changes later, bump to `.v2` and treat a missing/unparseable value as "no saved pet" (fall back to a freshly created default `PetState`) rather than attempting migration — acceptable for a local learning project per NFR5.
+**Versioned key**: as documented at `.v1`'s introduction, a shape change bumps the key and a missing/unparseable value is treated as "no saved pet" (fall back to a freshly created default `PetState`) rather than attempting migration — acceptable for a local learning project per NFR5. This is exactly what happened here: `.v1` saves are simply not found under the new `.v2` key and fall back cleanly, no migration code was written.

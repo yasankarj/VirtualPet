@@ -8,6 +8,7 @@ function isValidPetState(value: unknown): value is PetState {
 
   const stats = v.stats as Record<string, unknown> | undefined;
   const cooldowns = v.cooldowns as Record<string, unknown> | undefined;
+  const graces = v.graces as Record<string, unknown> | undefined;
 
   return (
     typeof stats === "object" &&
@@ -21,7 +22,11 @@ function isValidPetState(value: unknown): value is PetState {
     typeof cooldowns === "object" &&
     cooldowns !== null &&
     typeof cooldowns.feedRemainingMs === "number" &&
-    typeof cooldowns.playRemainingMs === "number"
+    typeof cooldowns.playRemainingMs === "number" &&
+    typeof graces === "object" &&
+    graces !== null &&
+    typeof graces.hungerGraceRemainingMs === "number" &&
+    typeof graces.happinessGraceRemainingMs === "number"
   );
 }
 

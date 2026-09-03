@@ -8,7 +8,10 @@ import {
   PLAY_ENERGY_DELTA,
   REST_DURATION_MS,
   REST_ENERGY_REGEN_PER_TICK,
-  ACTION_COOLDOWN_MS,
+  FEED_COOLDOWN_MS,
+  PLAY_COOLDOWN_MS,
+  FEED_HUNGER_GRACE_MS,
+  PLAY_HAPPINESS_GRACE_MS,
   TICK_INTERVAL_MS,
   HEALTH_DECLINE_PER_TICK,
   HEALTH_RECOVERY_PER_TICK,
@@ -57,15 +60,26 @@ export function computeMood(stats: PetStats): MoodState {
   return "NEUTRAL";
 }
 
-/** Decay Rule: hunger up, happiness down always; energy down unless resting (Rest Rule governs energy while resting). */
+/**
+ * Decay Rule: hunger up, happiness down, energy down every tick — all three suspended while resting
+ * (Rest Rule governs energy regen while resting; hunger/happiness simply hold). While awake, Hunger and
+ * Happiness are additionally grace-gated (Decay Pacing FR-DP2/FR-DP3): each holds instead of decaying
+ * while its own grace timer is still running. Energy is never grace-gated (FR-DP4).
+ */
 export function applyDecay(state: PetState): PetState {
+  if (state.isResting) return state;
+
   const stats: PetStats = {
     ...state.stats,
-    hunger: clamp(state.stats.hunger + DECAY_PER_TICK),
-    happiness: clamp(state.stats.happiness - DECAY_PER_TICK),
-    energy: state.isResting
-      ? state.stats.energy
-      : clamp(state.stats.energy - DECAY_PER_TICK),
+    hunger:
+      state.graces.hungerGraceRemainingMs > 0
+        ? state.stats.hunger
+        : clamp(state.stats.hunger + DECAY_PER_TICK),
+    happiness:
+      state.graces.happinessGraceRemainingMs > 0
+        ? state.stats.happiness
+        : clamp(state.stats.happiness - DECAY_PER_TICK),
+    energy: clamp(state.stats.energy - DECAY_PER_TICK),
   };
   return { ...state, stats };
 }
@@ -99,14 +113,26 @@ export function applyCooldownCountdown(state: PetState): PetState {
   };
 }
 
+/** Grace Countdown Rule (Decay Pacing FR-DP2/FR-DP3): Hunger/Happiness grace timers tick down every tick. */
+export function applyGraceCountdown(state: PetState): PetState {
+  return {
+    ...state,
+    graces: {
+      hungerGraceRemainingMs: Math.max(0, state.graces.hungerGraceRemainingMs - TICK_INTERVAL_MS),
+      happinessGraceRemainingMs: Math.max(0, state.graces.happinessGraceRemainingMs - TICK_INTERVAL_MS),
+    },
+  };
+}
+
 /**
- * Tick Process (business-logic-model.md #1): decay -> rest tick -> cooldown countdown -> recompute health.
- * Runs once per TICK_INTERVAL_MS while the app is open.
+ * Tick Process (business-logic-model.md #1): decay -> rest tick -> cooldown countdown -> grace countdown
+ * -> recompute health. Runs once per TICK_INTERVAL_MS, restarted after every player action (App.tsx).
  */
 export function tick(state: PetState): PetState {
   let next = applyDecay(state);
   next = applyRestTick(next);
   next = applyCooldownCountdown(next);
+  next = applyGraceCountdown(next);
   next = { ...next, stats: { ...next.stats, health: computeHealth(next.stats) } };
   return next;
 }
@@ -118,7 +144,8 @@ export function applyFeed(state: PetState): PetState {
   return {
     ...state,
     stats: { ...state.stats, hunger: clamp(state.stats.hunger + FEED_HUNGER_DELTA) },
-    cooldowns: { ...state.cooldowns, feedRemainingMs: ACTION_COOLDOWN_MS },
+    cooldowns: { ...state.cooldowns, feedRemainingMs: FEED_COOLDOWN_MS },
+    graces: { ...state.graces, hungerGraceRemainingMs: FEED_HUNGER_GRACE_MS },
   };
 }
 
@@ -134,7 +161,8 @@ export function applyPlay(state: PetState): PetState {
       hunger: clamp(state.stats.hunger + PLAY_HUNGER_DELTA),
       energy: clamp(state.stats.energy + PLAY_ENERGY_DELTA),
     },
-    cooldowns: { ...state.cooldowns, playRemainingMs: ACTION_COOLDOWN_MS },
+    cooldowns: { ...state.cooldowns, playRemainingMs: PLAY_COOLDOWN_MS },
+    graces: { ...state.graces, happinessGraceRemainingMs: PLAY_HAPPINESS_GRACE_MS },
   };
 }
 

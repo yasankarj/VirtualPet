@@ -159,3 +159,237 @@
 **Context**: Build and Test stage COMPLETE. CONSTRUCTION PHASE COMPLETE. Moving to OPERATIONS PHASE (placeholder).
 
 ---
+
+## New Change Request - Hunger/Feed Rebalance
+**Timestamp**: 2026-09-03T11:20:00Z
+**User Input**: "I need to do a change in the Hunger -> Feed behavior. Here the hunger increment rate and feeding delay is equal therefore the player is stuck in feed-hunger loop. Don't do any changes right away. Let's plan things off and identify the consquences and conflicting behaviors first!"
+**AI Response**: "Resuming existing AI-DLC project (previously COMPLETE through Build and Test/Operations placeholder). Treating this as a new pass through Requirements Analysis (Standard depth) for an Enhancement/Bug Fix request, per the adaptive workflow. Analyzed src/domain/rules.ts and constants.ts against business-rules.md's pre-existing 'Balance Caveat' note (which had already flagged this exact imbalance at original design time but deferred it). Identified root cause and compounding conflicts; drafting clarifying questions before writing an updated requirements document. No code changes made."
+**Context**: INCEPTION PHASE (re-entered) - Requirements Analysis for change request. Gate: will create clarifying-questions file and await answers before proceeding.
+
+---
+
+## Hunger/Feed Rebalance - Clarifying Questions Answered
+**Timestamp**: 2026-09-03T11:35:00Z
+**User Input**: "Answered!" (answers recorded in hunger-feed-rebalance-questions.md: Q1:A, Q2:D, Q3:A, Q4:A, Q5:A, Q6:B, Q7:B)
+**AI Response**: "Read all 7 answers. No contradictions or ambiguities detected — answers are internally consistent (broaden scope to Play/Happiness/Rest, keep thresholds open, combine multiple levers, but defer exact numbers to Functional Design). Generated aidlc-docs/inception/requirements/hunger-feed-rebalance-requirements.md (FR-RB1..FR-RB5, NFR-RB1..NFR-RB2, traceability table). Updated aidlc-state.md with a new 'Change Request: Hunger/Feed Rebalance' section tracking this cycle's stage progress separately from the completed original project history."
+**Context**: Requirements Analysis stage COMPLETE for this change request. Gate: awaiting explicit user approval before proceeding to User Stories (optional) / Workflow Planning.
+
+---
+
+## Hunger/Feed Rebalance - Requirements Approved
+**Timestamp**: 2026-09-03T11:40:00Z
+**User Input**: "Approve & Continue - proceed to Workflow Planning"
+**AI Response**: "Requirements approved; User Stories declined implicitly (user chose Workflow Planning directly, not Add User Stories). Proceeding to Workflow Planning stage for this change request."
+**Context**: Requirements Analysis stage APPROVED. User Stories SKIPPED (user proceeded straight to Workflow Planning). Moving to Workflow Planning.
+
+---
+
+## Hunger/Feed Rebalance - Workflow Planning
+**Timestamp**: 2026-09-03T11:45:00Z
+**User Input**: N/A (automated stage, following approval to proceed)
+**AI Response**: "Performed change impact and risk analysis (Low risk, Moderate testing complexity — sustainability invariants across multiple interacting constants need multi-cycle simulation tests). Determined phase plan: Application Design SKIP, Units Generation SKIP, Functional Design EXECUTE (business-rule retuning needed), NFR Requirements/Design SKIP (existing NFR4 + Property-Based Testing extension sufficient), Infrastructure Design SKIP, Code Generation + Build and Test ALWAYS. Generated aidlc-docs/inception/plans/hunger-feed-rebalance-execution-plan.md with Mermaid workflow visualization. Updated aidlc-state.md Change Request section stage progress."
+**Context**: Workflow Planning stage COMPLETE for this change request. Gate: awaiting explicit user approval before proceeding to Functional Design.
+
+---
+
+## Hunger/Feed Rebalance - Workflow Planning Approved
+**Timestamp**: 2026-09-03T11:50:00Z
+**User Input**: "Approve & Continue - proceed to Functional Design"
+**AI Response**: "Execution plan approved. Proceeding to Functional Design (unit: virtual-pet-web-app) to work out the exact constant/rule changes satisfying FR-RB1..FR-RB5."
+**Context**: Workflow Planning APPROVED. Moving to CONSTRUCTION PHASE - Functional Design.
+
+---
+
+## Hunger/Feed Rebalance - Functional Design Plan (Part 1)
+**Timestamp**: 2026-09-03T11:55:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Worked out concrete constant changes satisfying FR-RB1..FR-RB5 by explicit arithmetic/simulation (no open ambiguity requiring user Q&A, per Q7:B delegation): FEED_HUNGER_DELTA -15->-20, ACTION_COOLDOWN_MS split into FEED_COOLDOWN_MS=3000/PLAY_COOLDOWN_MS=5000, PLAY_HUNGER_DELTA +15->+8, PLAY_HAPPINESS_DELTA +20->+30, Rest now suspends Hunger/Happiness decay (mirroring existing Energy behavior), thresholds unchanged. Verified all 5 invariants (FR-RB1..FR-RB5) hold under the new numbers. Created aidlc-docs/construction/plans/hunger-feed-rebalance-functional-design-plan.md with plan steps and invariant-test scenarios for Code Generation. Presenting for review before writing final functional design artifacts."
+**Context**: Functional Design stage (unit: virtual-pet-web-app), Part 1 Planning complete. Gate: awaiting user approval of proposed numbers before Part 2 (artifact generation).
+
+---
+
+## Hunger/Feed Rebalance - Functional Design Generation (Part 2)
+**Timestamp**: 2026-09-03T12:05:00Z
+**User Input**: "Numbers look good, proceed with the artifacts"
+**AI Response**: "Updated business-rules.md (Constants table, Decay/Feed/Play/Rest Rules, replaced Balance Caveat note with resolved design contract listing FR-RB1..FR-RB5 as ongoing invariants) and business-logic-model.md (tick process step 1 now covers Hunger/Happiness/Energy suspension during Rest). Confirmed domain-entities.md and frontend-components.md require no changes (no new state fields, UI already generic over cooldown durations). Marked all functional design plan steps [x] complete. No code changed yet (still docs-only, per original request not to touch code until this stage's docs are ready)."
+**Context**: Functional Design stage (unit: virtual-pet-web-app) COMPLETE. Gate: awaiting explicit user approval before proceeding to Code Generation.
+
+---
+
+## Hunger/Feed Rebalance - Functional Design Approved
+**Timestamp**: 2026-09-03T12:10:00Z
+**User Input**: "Continue to Next Stage - proceed to Code Generation"
+**AI Response**: "Functional design approved. Proceeding to Code Generation (unit: virtual-pet-web-app) to implement the rebalanced constants/rules and the invariant tests."
+**Context**: Functional Design APPROVED. Moving to Code Generation.
+
+---
+
+## Hunger/Feed Rebalance - Code Generation Plan (Part 1)
+**Timestamp**: 2026-09-03T12:15:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Confirmed via grep that the changed constants (ACTION_COOLDOWN_MS, FEED_HUNGER_DELTA, PLAY_HUNGER_DELTA, PLAY_HAPPINESS_DELTA) are referenced only in src/domain/constants.ts and src/domain/rules.ts - no frontend changes needed. Created aidlc-docs/construction/plans/hunger-feed-rebalance-code-generation-plan.md with 5 steps: (1) constants.ts edits, (2) rules.ts applyDecay/applyFeed/applyPlay edits, (3) update existing rules.test.ts for renamed cooldown constants + new applyDecay describe block, (4) new tests/domain/rules.balance.test.ts implementing the 5 NFR-RB1 invariant scenarios, (5) update business-logic-summary.md doc. Presenting plan for approval before generation."
+**Context**: Code Generation stage (unit: virtual-pet-web-app), Part 1 Planning complete. Gate: awaiting user approval before Part 2 (actual code generation).
+
+---
+
+## Decay Pacing - Code Generation Plan Approved
+**Timestamp**: 2026-09-03T14:00:00Z
+**User Input**: "Approve & Continue - proceed with generation"
+**AI Response**: "Plan approved. Proceeding to Part 2 - executing the 12 steps in order."
+**Context**: Code Generation Part 1 (Planning) APPROVED (Decay Pacing change). Beginning Part 2 (Generation).
+
+---
+
+## Decay Pacing - Code Generation (Part 2 Complete)
+**Timestamp**: 2026-09-03T14:10:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Executed all 12 plan steps: types.ts (DecayGraces/PetState.graces), constants.ts (grace durations + .v2 key), factory.ts (default graces), rules.ts (grace-gated applyDecay, applyFeed/applyPlay arm grace, new applyGraceCountdown, updated tick() order), persistence.ts (validator extended), App.tsx (tickEpoch clock-restart), 5 test files updated + 1 new (App.timing.test.tsx with fake timers), business-logic-summary.md updated. First `npm test` run caught a 6th file needing the same graces-field fix that wasn't in the original plan: tests/domain/rules.property.test.ts's petStateArb (separate from persistence.property.test.ts) also builds raw PetState objects and crashed with 'Cannot read properties of undefined (reading hungerGraceRemainingMs)' via fast-check's shrunk counterexample. Fixed immediately. Re-ran: all 54 tests pass (was 47). `npm run build`: clean, tsc + vite build succeed. Ran a headless Chromium smoke test against the live dev server: confirmed Hunger stays flat for a full ~3s after Feed (was near-instant resumption before this change), then resumes decaying — grace + clock-restart both confirmed working end-to-end in the real UI, zero console errors. Cleaned up temp script, stopped dev server."
+**Context**: Code Generation stage (unit: virtual-pet-web-app) Part 2 COMPLETE for Decay Pacing change, verified via test suite, build, and live browser check. Gate: awaiting explicit user approval before proceeding to Build and Test.
+
+---
+
+## Decay Pacing - Code Generation Approved
+**Timestamp**: 2026-09-03T14:15:00Z
+**User Input**: "Continue to Next Stage - proceed to Build and Test"
+**AI Response**: "Code Generation approved for unit virtual-pet-web-app (Decay Pacing change). Proceeding to Build and Test, including the old .v1-save-fallback check called out in the execution plan's success criteria."
+**Context**: Code Generation APPROVED (Decay Pacing change). Moving to Build and Test.
+
+---
+
+## Decay Pacing - Build and Test Stage
+**Timestamp**: 2026-09-03T14:20:00Z
+**Build Status**: Success
+**Test Status**: Pass (54/54 unit, 3/3 integration/smoke)
+**Files Updated**:
+- build-and-test/unit-test-instructions.md (counts + new "Verified Result" entry)
+- build-and-test/integration-test-instructions.md (new Scenario 3 - old .v1 save fallback - + new "Verified Result" entry)
+- build-and-test/build-and-test-summary.md (new "Decay Pacing" section)
+**AI Response**: "Ran the explicit old-.v1-save fallback check called out in the execution plan's success criteria: wrote a pre-Decay-Pacing-shaped save under the old key via a headless browser, reloaded, confirmed the app shows a fresh default pet rather than the stale/incompatible data - no crash, no console errors. Also re-verified the core pacing fix live: idled 2.2s (hunger ticked twice as expected), fed (hunger cleared to 0), then confirmed hunger held flat for the full ~3s grace+clock-restart window before resuming decay. Updated the existing build-and-test docs in place with dated sections (same pattern as both prior changes). Cleaned up temporary scripts and stopped the dev server each time."
+**Context**: Build and Test stage COMPLETE for the Decay Pacing change. Gate: awaiting explicit user approval.
+
+---
+
+## Hunger/Feed Rebalance - Code Generation Plan Approved
+**Timestamp**: 2026-09-03T12:20:00Z
+**User Input**: "Approve & Continue - proceed with generation"
+**AI Response**: "Plan approved. Proceeding to Part 2 - executing the 5 steps in order."
+**Context**: Code Generation Part 1 (Planning) APPROVED. Beginning Part 2 (Generation).
+
+---
+
+## Hunger/Feed Rebalance - Code Generation (Part 2 Complete)
+**Timestamp**: 2026-09-03T12:30:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Executed all 5 plan steps: (1) src/domain/constants.ts - FEED_HUNGER_DELTA=-20, PLAY_HAPPINESS_DELTA=+30, PLAY_HUNGER_DELTA=+8, ACTION_COOLDOWN_MS split into FEED_COOLDOWN_MS=3000/PLAY_COOLDOWN_MS=5000; (2) src/domain/rules.ts - applyDecay now suspends hunger/happiness/energy together while resting, applyFeed/applyPlay use their own cooldown constants; (3) tests/domain/rules.test.ts - updated cooldown assertions, added applyDecay describe block (awake + resting cases); (4) new tests/domain/rules.balance.test.ts with 5 simulation tests for FR-RB1..FR-RB5; (5) updated business-logic-summary.md. Ran `npm test`: all 47 tests pass (was 40 before this change, +2 applyDecay tests +5 balance tests). Ran `npm run build`: tsc + vite build succeed with no errors. All plan checkboxes marked [x]."
+**Context**: Code Generation stage (unit: virtual-pet-web-app) Part 2 COMPLETE, verified via test suite and build. Gate: awaiting explicit user approval before proceeding to Build and Test.
+
+---
+
+## Hunger/Feed Rebalance - Code Generation Approved
+**Timestamp**: 2026-09-03T12:35:00Z
+**User Input**: "Continue to Next Stage - proceed to Build and Test"
+**AI Response**: "Code Generation approved for unit virtual-pet-web-app (Hunger/Feed Rebalance change). Proceeding to Build and Test."
+**Context**: Code Generation APPROVED. Moving to Build and Test.
+
+---
+
+## Hunger/Feed Rebalance - Build and Test Stage
+**Timestamp**: 2026-09-03T12:45:00Z
+**Build Status**: Success
+**Test Status**: Pass (47/47 unit, 2/2 integration/smoke)
+**Files Updated**:
+- build-and-test/unit-test-instructions.md (counts + new "Verified Result" entry)
+- build-and-test/integration-test-instructions.md (new "Verified Result" entry)
+- build-and-test/build-and-test-summary.md (new "Hunger/Feed Rebalance" section)
+**AI Response**: "Since the build/test commands themselves are unchanged from the original project, updated the existing build-and-test docs in place (dated sections) rather than regenerating from scratch. Re-ran npm test (47/47 pass) and npm run build (clean) after fixing one stale test found during this stage: tests/App.test.tsx hardcoded FEED_HUNGER_DELTA's old value (-15) instead of importing the constant, which coincidentally still passed post-rebalance due to clamping - fixed to import FEED_HUNGER_DELTA. Ran a headless Chromium smoke test against the live dev server (via Playwright, already a project devDependency): confirmed Feed now shows/clears a 3-second cooldown (was 5s) end-to-end through the real UI, Hunger still clamps at 0, zero console errors. Cleaned up the temporary smoke-test script and stopped the dev server afterward."
+**Context**: Build and Test stage COMPLETE for the Hunger/Feed Rebalance change. Gate: awaiting explicit user approval.
+
+---
+
+## Hunger/Feed Rebalance - Build and Test Approved
+**Timestamp**: 2026-09-03T12:50:00Z
+**User Input**: "Approve & Continue - proceed to Operations"
+**AI Response**: "Build and Test approved. Proceeding to Operations phase, which remains a placeholder (no deployment/monitoring workflow defined). Hunger/Feed Rebalance change is complete through Build and Test."
+**Context**: Build and Test APPROVED. CONSTRUCTION PHASE COMPLETE for this change. Moving to OPERATIONS PHASE (placeholder).
+
+---
+
+## New Change Request - Decay Pacing / "Sudden" Feel After Feeding
+**Timestamp**: 2026-09-03T13:00:00Z
+**User Input**: "Now it works. But the ticking seems to be too sudden. Means the hunger decays right away we feed it! How can we improve that. Let's adjust it. DOn't change code right away! let's plan it out with the recent requirement change"
+**AI Response**: "Resuming project for a new change request, building on the just-completed Hunger/Feed Rebalance. Traced the mechanism: App.tsx runs a single global setInterval(tick, TICK_INTERVAL_MS=1000ms) that fires independently of player actions - it is never reset by Feed/Play. So decay can resume anywhere from ~0ms to ~1000ms after a Feed click depending on where in the global tick cycle the click lands, which is what reads as 'sudden'/inconsistent. This is a distinct issue from the sustainability math fixed in the prior change (long-run trend vs. moment-to-moment feel) but touches the same rule set, so treating it as a new Requirements Analysis pass that extends hunger-feed-rebalance-requirements.md. No code changed."
+**Context**: INCEPTION PHASE (re-entered) - Requirements Analysis for a second change request. Gate: will create clarifying-questions file and await answers before proceeding.
+
+---
+
+## Decay Pacing - Clarifying Questions Answered, Ambiguities Detected
+**Timestamp**: 2026-09-03T13:10:00Z
+**User Input**: "Answered" (answers recorded in hunger-decay-pacing-questions.md: Q1:B, Q2:D, Q3:A, Q4:B, Q5:B)
+**AI Response**: "Detected 2 ambiguities requiring clarification: (1) Q1:B says the core issue is the overall tick rate feeling too fast, but Q2:D (align-to-action + grace period) doesn't touch the global TICK_INTERVAL_MS - only Q2:C would; asked whether idle/background pacing also needs slowing. (2) Q4's ~3-4s grace period vs. Feed's 3s cooldown means Hunger would almost never decay during active feeding (each Feed re-arms the pause before the prior one expires) - confirmed this is a real consequence, not obviously intended, and asked to confirm. Created aidlc-docs/inception/requirements/hunger-decay-pacing-clarification-questions.md. Not proceeding to requirements.md until resolved."
+**Context**: Requirements Analysis (Decay Pacing change) - contradiction/ambiguity detection per question-format-guide.md. Gate: awaiting clarification answers.
+
+---
+
+## Decay Pacing - Clarification Answered, Requirements Written
+**Timestamp**: 2026-09-03T13:20:00Z
+**User Input**: "yes this looks good!" (chat) - then, since the [Answer]: tags were still empty, answers were collected via structured question UI: Clarification Q1=A (post-action only, don't slow idle tick rate), Clarification Q2=B (keep grace shorter than Feed's cooldown, don't near-freeze Hunger). Recorded both into hunger-decay-pacing-clarification-questions.md for the audit trail.
+**AI Response**: "No further contradictions. Generated aidlc-docs/inception/requirements/hunger-decay-pacing-requirements.md: FR-DP1 (align decay clock to actions, no idle-pace change), FR-DP2/FR-DP3 (short post-Feed/post-Play grace periods, each strictly shorter than that action's own cooldown), FR-DP4 (explicit scoping decision: Energy excluded from the grace mechanism, flagged as a narrowing of Q3's literal wording for the user to override if wrong), FR-DP5/FR-DP6 (neglect guardrail and prior FR-RB1..FR-RB5 invariants preserved/strengthened, never loosened). Exact grace durations deferred to Functional Design (NFR-DP1), constrained to be less than each action's cooldown."
+**Context**: Requirements Analysis stage COMPLETE for Decay Pacing change. Gate: awaiting explicit user approval.
+
+---
+
+## Decay Pacing - Requirements Approved
+**Timestamp**: 2026-09-03T13:25:00Z
+**User Input**: "Approve and continue"
+**AI Response**: "Requirements approved; User Stories declined implicitly (user proceeded without selecting Add User Stories). Proceeding to Workflow Planning."
+**Context**: Requirements Analysis APPROVED. User Stories SKIPPED. Moving to Workflow Planning.
+
+---
+
+## Decay Pacing - Workflow Planning
+**Timestamp**: 2026-09-03T13:30:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Impact/risk analysis: Risk elevated to Medium (first change in this series to touch persisted data shape + core tick scheduling, vs. prior Low-risk constants-only changes). Data model change flagged: new PetState grace-tracking fields require bumping PET_STATE_STORAGE_KEY from .v1 to .v2, consistent with the project's own pre-documented no-migration policy (NFR5) - not a new decision, just applying existing convention. Phase plan: Application Design SKIP, Units Generation SKIP, Functional Design EXECUTE, NFR Requirements/Design SKIP, Infrastructure Design SKIP, Code Generation + Build and Test ALWAYS (Build and Test to explicitly verify old .v1 saves fall back gracefully). Generated aidlc-docs/inception/plans/hunger-decay-pacing-execution-plan.md."
+**Context**: Workflow Planning stage COMPLETE for Decay Pacing change. Gate: awaiting explicit user approval before proceeding to Functional Design.
+
+---
+
+## Decay Pacing - Workflow Planning Approved
+**Timestamp**: 2026-09-03T13:35:00Z
+**User Input**: "Approve & Continue - proceed to Functional Design"
+**AI Response**: "Execution plan approved. Proceeding to Functional Design (unit: virtual-pet-web-app) to design the grace-tracking state, revised Tick Process, and exact grace durations."
+**Context**: Workflow Planning APPROVED. Moving to CONSTRUCTION PHASE - Functional Design.
+
+---
+
+## Decay Pacing - Functional Design Plan (Part 1)
+**Timestamp**: 2026-09-03T13:40:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Read src/App.tsx to ground the design in the actual current implementation. Designed: (1) tickEpoch counter in App state, bumped by action handlers, in the tick-interval useEffect's dependency array, to restart the decay clock on every action (FR-DP1) - documented the accepted bounded trade-off for back-to-back different actions. (2) New DecayGraces type/PetState.graces field with FEED_HUNGER_GRACE_MS=2000 and PLAY_HAPPINESS_GRACE_MS=3000 (both under their respective cooldowns per NFR-DP1). (3) Grace-gated Decay Rule, Energy explicitly excluded (FR-DP4). (4) Storage key bump to .v2 (NFR-DP3), no migration code per existing documented policy. Re-verified FR-RB1/RB2/RB3 all strengthened (-15/cycle, +20/cycle, -102/30s respectively) and FR-RB5 neglect guardrail exactly unchanged. Created aidlc-docs/construction/plans/hunger-decay-pacing-functional-design-plan.md. Presenting for review before writing final artifacts."
+**Context**: Functional Design stage (unit: virtual-pet-web-app), Part 1 Planning complete. Gate: awaiting user approval before Part 2 (artifact generation).
+
+---
+
+## Decay Pacing - Functional Design Generation (Part 2)
+**Timestamp**: 2026-09-03T13:45:00Z
+**User Input**: "Numbers look good, proceed with the artifacts"
+**AI Response**: "Updated business-rules.md (Constants table with FEED_HUNGER_GRACE_MS/PLAY_HAPPINESS_GRACE_MS, grace-gated Decay Rule with Energy explicitly excluded, Feed/Play Rules now arm grace, new Grace Countdown Rule, new Action-Triggered Clock Restart rule documenting the bounded back-to-back-actions trade-off, refreshed FR-RB1/RB2/RB3 invariant numbers, new grace-vs-cooldown invariant). Updated business-logic-model.md (Tick Process now 6 steps incl. grace countdown, Feed/Play/Rest Actions note the timer restart, Persistence Process bumped to .v2 with rationale). Updated domain-entities.md (new DecayGraces type, PetState.graces field, persisted-shape JSON updated, versioned-key note extended to record this as the first real use of the pre-documented bump policy). Confirmed frontend-components.md needs no changes. Marked all functional design plan steps [x] complete. No code changed yet."
+**Context**: Functional Design stage (unit: virtual-pet-web-app) COMPLETE for Decay Pacing change. Gate: awaiting explicit user approval before proceeding to Code Generation.
+
+---
+
+## Decay Pacing - Functional Design Approved
+**Timestamp**: 2026-09-03T13:50:00Z
+**User Input**: "Please continue"
+**AI Response**: "Functional design approved. Proceeding to Code Generation (unit: virtual-pet-web-app)."
+**Context**: Functional Design APPROVED. Moving to Code Generation.
+
+---
+
+## Decay Pacing - Code Generation Plan (Part 1)
+**Timestamp**: 2026-09-03T13:55:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Re-read persistence.ts and persistence.property.test.ts before planning: found isValidPetState doesn't validate graces shape (needs extending to avoid a crash on malformed data), and petStateArb needs a graces field just to type-check against the updated PetState. Created aidlc-docs/construction/plans/hunger-decay-pacing-code-generation-plan.md with 12 steps covering types.ts, constants.ts, factory.ts, rules.ts (grace-gated decay, applyGraceCountdown, tick() ordering), persistence.ts validator, App.tsx (tickEpoch clock-restart), and 5 test-file updates including a new fake-timer component test (App.timing.test.tsx) for FR-DP1. Presenting plan for approval before generation."
+**Context**: Code Generation stage (unit: virtual-pet-web-app), Part 1 Planning complete. Gate: awaiting user approval before Part 2 (actual code generation).
+
+---

@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   applyCooldownCountdown,
+  applyDecay,
   applyFeed,
+  applyGraceCountdown,
   applyPlay,
   applyRest,
   applyRestTick,
@@ -9,10 +11,14 @@ import {
   computeMood,
 } from "../../src/domain/rules";
 import {
-  ACTION_COOLDOWN_MS,
+  DECAY_PER_TICK,
+  FEED_COOLDOWN_MS,
   FEED_HUNGER_DELTA,
+  FEED_HUNGER_GRACE_MS,
+  PLAY_COOLDOWN_MS,
   PLAY_ENERGY_DELTA,
   PLAY_HAPPINESS_DELTA,
+  PLAY_HAPPINESS_GRACE_MS,
   PLAY_HUNGER_DELTA,
   REST_DURATION_MS,
   REST_ENERGY_REGEN_PER_TICK,
@@ -33,7 +39,8 @@ describe("applyFeed", () => {
   it("decreases hunger and sets the feed cooldown", () => {
     const result = applyFeed(state({ stats: stats({ hunger: 50 }) }));
     expect(result.stats.hunger).toBe(50 + FEED_HUNGER_DELTA);
-    expect(result.cooldowns.feedRemainingMs).toBe(ACTION_COOLDOWN_MS);
+    expect(result.cooldowns.feedRemainingMs).toBe(FEED_COOLDOWN_MS);
+    expect(result.graces.hungerGraceRemainingMs).toBe(FEED_HUNGER_GRACE_MS);
   });
 
   it("is a no-op while on cooldown", () => {
@@ -53,7 +60,8 @@ describe("applyPlay", () => {
     expect(result.stats.happiness).toBe(50 + PLAY_HAPPINESS_DELTA);
     expect(result.stats.hunger).toBe(50 + PLAY_HUNGER_DELTA);
     expect(result.stats.energy).toBe(50 + PLAY_ENERGY_DELTA);
-    expect(result.cooldowns.playRemainingMs).toBe(ACTION_COOLDOWN_MS);
+    expect(result.cooldowns.playRemainingMs).toBe(PLAY_COOLDOWN_MS);
+    expect(result.graces.happinessGraceRemainingMs).toBe(PLAY_HAPPINESS_GRACE_MS);
   });
 
   it("is a no-op while on cooldown", () => {
@@ -100,12 +108,60 @@ describe("applyRest / applyRestTick", () => {
   });
 });
 
+describe("applyDecay", () => {
+  it("decays hunger up, happiness down, and energy down while awake", () => {
+    const s = state({ isResting: false, stats: stats({ hunger: 50, happiness: 50, energy: 50 }) });
+    const result = applyDecay(s);
+    expect(result.stats.hunger).toBe(50 + DECAY_PER_TICK);
+    expect(result.stats.happiness).toBe(50 - DECAY_PER_TICK);
+    expect(result.stats.energy).toBe(50 - DECAY_PER_TICK);
+  });
+
+  it("leaves hunger, happiness, and energy unchanged while resting (FR-RB4)", () => {
+    const s = state({ isResting: true, stats: stats({ hunger: 50, happiness: 50, energy: 50 }) });
+    expect(applyDecay(s)).toEqual(s);
+  });
+
+  it("skips only Hunger decay while its grace is active (FR-DP2) — Happiness/Energy still decay", () => {
+    const s = state({
+      isResting: false,
+      stats: stats({ hunger: 50, happiness: 50, energy: 50 }),
+      graces: { hungerGraceRemainingMs: 1000, happinessGraceRemainingMs: 0 },
+    });
+    const result = applyDecay(s);
+    expect(result.stats.hunger).toBe(50);
+    expect(result.stats.happiness).toBe(50 - DECAY_PER_TICK);
+    expect(result.stats.energy).toBe(50 - DECAY_PER_TICK);
+  });
+
+  it("skips only Happiness decay while its grace is active (FR-DP3) — Hunger/Energy still decay", () => {
+    const s = state({
+      isResting: false,
+      stats: stats({ hunger: 50, happiness: 50, energy: 50 }),
+      graces: { hungerGraceRemainingMs: 0, happinessGraceRemainingMs: 1000 },
+    });
+    const result = applyDecay(s);
+    expect(result.stats.hunger).toBe(50 + DECAY_PER_TICK);
+    expect(result.stats.happiness).toBe(50);
+    expect(result.stats.energy).toBe(50 - DECAY_PER_TICK);
+  });
+});
+
 describe("applyCooldownCountdown", () => {
   it("counts down both cooldowns without going below zero", () => {
     const s = state({ cooldowns: { feedRemainingMs: 1500, playRemainingMs: 500 } });
     const result = applyCooldownCountdown(s);
     expect(result.cooldowns.feedRemainingMs).toBe(500);
     expect(result.cooldowns.playRemainingMs).toBe(0);
+  });
+});
+
+describe("applyGraceCountdown", () => {
+  it("counts down both grace timers without going below zero", () => {
+    const s = state({ graces: { hungerGraceRemainingMs: 1500, happinessGraceRemainingMs: 500 } });
+    const result = applyGraceCountdown(s);
+    expect(result.graces.hungerGraceRemainingMs).toBe(500);
+    expect(result.graces.happinessGraceRemainingMs).toBe(0);
   });
 });
 

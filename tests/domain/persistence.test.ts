@@ -22,6 +22,13 @@ describe("loadState", () => {
     expect(loadState()).toEqual(createNewPet());
   });
 
+  it("returns a fresh default pet when saved data is missing the graces field", () => {
+    const pet = createNewPet();
+    const { graces: _graces, ...withoutGraces } = pet;
+    localStorage.setItem(PET_STATE_STORAGE_KEY, JSON.stringify(withoutGraces));
+    expect(loadState()).toEqual(createNewPet());
+  });
+
   it("returns the saved state when it is valid", () => {
     const pet = createNewPet();
     pet.stats.hunger = 42;
