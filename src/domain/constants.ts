@@ -40,4 +40,7 @@ export const NEW_PET_STARTING_STATS = {
   health: 100,
 } as const;
 
-export const PET_STATE_STORAGE_KEY = "virtualPet.state.v2";
+export const DEFAULT_PET_NAME = "Pet";
+export const MAX_PET_NAME_LENGTH = 20;
+
+export const PET_STATE_STORAGE_KEY = "virtualPet.state.v3";

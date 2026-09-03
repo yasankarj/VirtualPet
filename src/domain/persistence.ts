@@ -11,6 +11,7 @@ function isValidPetState(value: unknown): value is PetState {
   const graces = v.graces as Record<string, unknown> | undefined;
 
   return (
+    typeof v.name === "string" &&
     typeof stats === "object" &&
     stats !== null &&
     typeof stats.hunger === "number" &&
@@ -52,5 +53,22 @@ export function saveState(state: PetState): void {
     localStorage.setItem(PET_STATE_STORAGE_KEY, JSON.stringify(state));
   } catch {
     // localStorage unavailable — app continues in-memory for the session (business-logic-model.md).
+  }
+}
+
+/**
+ * True only if a currently-valid PetState already exists under the storage key — used to gate the
+ * first-launch naming prompt (Refresh/Naming FR-NR3), independent of loadState's fallback behavior
+ * (a previously-skipped naming prompt still saves a valid PetState, so this must not be re-derived
+ * from whether `name` equals the default).
+ */
+export function hasSavedPet(): boolean {
+  try {
+    const raw = localStorage.getItem(PET_STATE_STORAGE_KEY);
+    if (!raw) return false;
+    const parsed: unknown = JSON.parse(raw);
+    return isValidPetState(parsed);
+  } catch {
+    return false;
   }
 }

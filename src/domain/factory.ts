@@ -1,8 +1,9 @@
-import { NEW_PET_STARTING_STATS } from "./constants";
+import { DEFAULT_PET_NAME, NEW_PET_STARTING_STATS } from "./constants";
 import type { PetState } from "./types";
 
-export function createNewPet(): PetState {
+export function createNewPet(name: string = DEFAULT_PET_NAME): PetState {
   return {
+    name,
     stats: { ...NEW_PET_STARTING_STATS },
     isResting: false,
     restRemainingMs: 0,

@@ -109,3 +109,31 @@ Player-reported: Hunger decay can resume almost immediately after Feeding becaus
 - **Status**: Complete (INCEPTION + CONSTRUCTION for this change); OPERATIONS is a placeholder with no further action defined
 - **Artifacts**: `aidlc-docs/inception/requirements/hunger-decay-pacing-questions.md`, `aidlc-docs/inception/requirements/hunger-decay-pacing-clarification-questions.md`, `aidlc-docs/inception/requirements/hunger-decay-pacing-requirements.md`, `aidlc-docs/inception/plans/hunger-decay-pacing-execution-plan.md`, `aidlc-docs/construction/plans/hunger-decay-pacing-functional-design-plan.md`, `aidlc-docs/construction/plans/hunger-decay-pacing-code-generation-plan.md`, updated functional-design docs, updated `src/domain/*` + `src/App.tsx` + tests, updated `aidlc-docs/construction/build-and-test/*`
 - **Artifacts**: `aidlc-docs/inception/requirements/hunger-feed-rebalance-questions.md`, `aidlc-docs/inception/requirements/hunger-feed-rebalance-requirements.md`, `aidlc-docs/inception/plans/hunger-feed-rebalance-execution-plan.md`, `aidlc-docs/construction/plans/hunger-feed-rebalance-functional-design-plan.md`, `aidlc-docs/construction/plans/hunger-feed-rebalance-code-generation-plan.md`, updated functional-design docs, updated `src/domain/{constants,rules}.ts` + tests, updated `aidlc-docs/construction/build-and-test/*`
+
+---
+
+## Change Request: Refresh Game & Pet Naming/Renaming (2026-09-03)
+
+### Description
+Two net-new features requested together: (1) a Refresh control to reset the game, and (2) the ability to name the pet at first launch and rename it later. Neither existed before this change — `PetState` has no `name` field, and there is no reset/refresh mechanism anywhere in the app.
+
+### Stage Progress
+- [x] Workspace Detection - RESUMED (existing project, code present, no rerun needed)
+- [x] Requirements Analysis - COMPLETE (Standard depth; 8 initial questions + 1 clarification question answered, requirements document written) — APPROVED
+- [x] User Stories - SKIPPED (user proceeded directly to Workflow Planning; single user type, unambiguous requirements)
+- [x] Workflow Planning - COMPLETE (approved) — see `naming-and-refresh-execution-plan.md`; Risk: Medium
+- [ ] Application Design - SKIP (no new components/services; within existing component boundary)
+- [ ] Units Generation - SKIP (single existing unit, no decomposition needed)
+- [x] Functional Design (unit: virtual-pet-web-app) - COMPLETE (approval pending) — `name` field/constants, Name Validation Rule, Rename Rule, Reset Rule, first-launch detection via `hasSavedPet()`, storage key bumped to `.v3`, new `NameDialog`/`RefreshButton` components, `PetDisplay` now shows the pet's name
+- [ ] NFR Requirements - SKIP (extends existing NFR4/NFR5, no new category)
+- [ ] NFR Design - SKIP (NFR Requirements skipped)
+- [ ] Infrastructure Design - SKIP (client-side only)
+- [x] Code Generation - COMPLETE (approval pending) — `src/domain/{types,constants,factory,rules,persistence}.ts` and `src/App.tsx` modified; new `src/components/{NameDialog,RefreshButton}.tsx`; `src/components/PetDisplay.tsx` and `src/index.css` updated; 8 test files updated/added; 87/87 tests pass, build succeeds, live browser smoke test confirms naming/rename/refresh end-to-end with zero console errors
+- [x] Build and Test - COMPLETE (approval pending) — 87/87 unit tests pass, build succeeds, 5/5 integration scenarios pass including a new `.v2`→`.v3` old-save fallback check
+
+### Current Status
+- **Lifecycle Phase**: OPERATIONS (placeholder)
+- **Current Stage**: Operations - PLACEHOLDER
+- **Next Stage**: None — Refresh Game & Pet Naming/Renaming change COMPLETE through Build and Test
+- **Status**: Complete (INCEPTION + CONSTRUCTION for this change); OPERATIONS is a placeholder with no further action defined
+- **Artifacts**: `aidlc-docs/inception/requirements/naming-and-refresh-questions.md`, `aidlc-docs/inception/requirements/naming-and-refresh-clarification-questions.md`, `aidlc-docs/inception/requirements/naming-and-refresh-requirements.md`, `aidlc-docs/inception/plans/naming-and-refresh-execution-plan.md`, `aidlc-docs/construction/plans/naming-and-refresh-functional-design-plan.md`, `aidlc-docs/construction/plans/naming-and-refresh-code-generation-plan.md`, updated functional-design docs, updated `src/domain/*` + `src/App.tsx` + `src/components/*` + `src/index.css` + tests, updated `business-logic-summary.md`/`frontend-components-summary.md`, updated `aidlc-docs/construction/build-and-test/*`

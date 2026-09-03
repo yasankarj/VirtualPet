@@ -9,12 +9,17 @@ import {
   applyRestTick,
   computeHealth,
   computeMood,
+  renamePet,
+  resetPet,
+  validateName,
 } from "../../src/domain/rules";
 import {
   DECAY_PER_TICK,
+  DEFAULT_PET_NAME,
   FEED_COOLDOWN_MS,
   FEED_HUNGER_DELTA,
   FEED_HUNGER_GRACE_MS,
+  MAX_PET_NAME_LENGTH,
   PLAY_COOLDOWN_MS,
   PLAY_ENERGY_DELTA,
   PLAY_HAPPINESS_DELTA,
@@ -184,6 +189,66 @@ describe("computeHealth", () => {
   it("recovers slowly when no stat is critical", () => {
     const before = stats({ hunger: 10, happiness: 80, energy: 80, health: 50 });
     expect(computeHealth(before)).toBeGreaterThan(50);
+  });
+});
+
+describe("validateName", () => {
+  it("returns the trimmed name when valid", () => {
+    expect(validateName("  Rex  ")).toBe("Rex");
+  });
+
+  it("returns null for an empty string", () => {
+    expect(validateName("")).toBeNull();
+  });
+
+  it("returns null for a whitespace-only string", () => {
+    expect(validateName("   ")).toBeNull();
+  });
+
+  it("returns null when the trimmed name exceeds MAX_PET_NAME_LENGTH", () => {
+    expect(validateName("a".repeat(MAX_PET_NAME_LENGTH + 1))).toBeNull();
+  });
+
+  it("accepts a name exactly at MAX_PET_NAME_LENGTH", () => {
+    const name = "a".repeat(MAX_PET_NAME_LENGTH);
+    expect(validateName(name)).toBe(name);
+  });
+});
+
+describe("renamePet", () => {
+  it("sets the trimmed name when valid", () => {
+    const result = renamePet(state({ name: "Old" }), "  New Name  ");
+    expect(result.name).toBe("New Name");
+  });
+
+  it("is a no-op when the new name is invalid", () => {
+    const s = state({ name: "Old" });
+    expect(renamePet(s, "   ")).toEqual(s);
+  });
+});
+
+describe("resetPet", () => {
+  it("resets stats, cooldowns, graces, and resting state to fresh-pet defaults", () => {
+    const s = state({
+      name: "Rex",
+      stats: stats({ hunger: 90, happiness: 5, energy: 5, health: 10 }),
+      isResting: true,
+      restRemainingMs: 4000,
+      cooldowns: { feedRemainingMs: 1000, playRemainingMs: 2000 },
+      graces: { hungerGraceRemainingMs: 500, happinessGraceRemainingMs: 1500 },
+    });
+    const result = resetPet(s);
+    expect(result).toEqual(createNewPet("Rex"));
+  });
+
+  it("preserves the pet's current name", () => {
+    const result = resetPet(state({ name: "Rex" }));
+    expect(result.name).toBe("Rex");
+  });
+
+  it("preserves DEFAULT_PET_NAME for a pet that was never explicitly named", () => {
+    const result = resetPet(state({ name: DEFAULT_PET_NAME }));
+    expect(result.name).toBe(DEFAULT_PET_NAME);
   });
 });
 

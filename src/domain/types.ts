@@ -16,6 +16,7 @@ export interface DecayGraces {
 }
 
 export interface PetState {
+  name: string;
   stats: PetStats;
   isResting: boolean;
   restRemainingMs: number;
