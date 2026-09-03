@@ -1,0 +1,29 @@
+import { beforeEach, describe, expect, it } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import App from "../src/App";
+import { NEW_PET_STARTING_STATS } from "../src/domain/constants";
+
+describe("App", () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("shows the default new-pet stats when nothing is saved", () => {
+    render(<App />);
+    expect(screen.getByTestId("stat-bar-Hunger")).toHaveTextContent(
+      `Hunger: ${NEW_PET_STARTING_STATS.hunger}`,
+    );
+    expect(screen.getByTestId("stat-bar-Happiness")).toHaveTextContent(
+      `Happiness: ${NEW_PET_STARTING_STATS.happiness}`,
+    );
+  });
+
+  it("updates the Hunger stat display after clicking Feed", async () => {
+    render(<App />);
+    await userEvent.click(screen.getByTestId("action-panel-feed-button"));
+    expect(screen.getByTestId("stat-bar-Hunger")).toHaveTextContent(
+      `Hunger: ${Math.max(0, NEW_PET_STARTING_STATS.hunger - 15)}`,
+    );
+  });
+});

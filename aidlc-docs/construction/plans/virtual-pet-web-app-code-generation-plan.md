@@ -13,51 +13,51 @@
 ## Steps
 
 ### Step 1: Project Structure Setup (greenfield)
-- [ ] Scaffold Vite + React + TypeScript project at workspace root (`package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`, `src/main.tsx`)
-- [ ] Add Vitest + @testing-library/react + jsdom + fast-check as dev dependencies, configure `vite.config.ts` test block
-- [ ] Create `src/`, `src/domain/`, `src/components/`, `src/assets/`, `tests/` directory structure
+- [x] Scaffold Vite + React + TypeScript project at workspace root (`package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`, `src/main.tsx`)
+- [x] Add Vitest + @testing-library/react + jsdom + fast-check as dev dependencies, configure `vite.config.ts` test block
+- [x] Create `src/`, `src/domain/`, `src/components/`, `src/assets/`, `tests/` directory structure
 
 ### Step 2: Business Logic Generation
 *Traces: FR1, FR2, FR3, FR4, FR5, FR7, NFR4 — business-logic-model.md, business-rules.md, domain-entities.md*
-- [ ] `src/domain/types.ts` — `PetStats`, `ActionCooldowns`, `PetState`, `MoodState` types (domain-entities.md)
-- [ ] `src/domain/constants.ts` — all tunable constants (business-rules.md Constants table)
-- [ ] `src/domain/rules.ts` — pure functions: `clamp`, `applyDecay`, `applyFeed`, `applyPlay`, `applyRest` (trigger), `applyRestTick`, `applyCooldownCountdown`, `computeHealth`, `computeMood`, `tick` (composes decay + rest + cooldown + health per business-logic-model.md #1)
-- [ ] `src/domain/persistence.ts` — `loadState`, `saveState` for `localStorage` key `virtualPet.state.v1`, with corrupted/missing-data fallback to `createNewPet()`
-- [ ] `src/domain/factory.ts` — `createNewPet()` using `NEW_PET_STARTING_STATS`
+- [x] `src/domain/types.ts` — `PetStats`, `ActionCooldowns`, `PetState`, `MoodState` types (domain-entities.md)
+- [x] `src/domain/constants.ts` — all tunable constants (business-rules.md Constants table)
+- [x] `src/domain/rules.ts` — pure functions: `clamp`, `applyDecay`, `applyFeed`, `applyPlay`, `applyRest` (trigger), `applyRestTick`, `applyCooldownCountdown`, `computeHealth`, `computeMood`, `tick` (composes decay + rest + cooldown + health per business-logic-model.md #1)
+- [x] `src/domain/persistence.ts` — `loadState`, `saveState` for `localStorage` key `virtualPet.state.v1`, with corrupted/missing-data fallback to `createNewPet()`
+- [x] `src/domain/factory.ts` — `createNewPet()` using `NEW_PET_STARTING_STATS`
 
 ### Step 3: Business Logic Unit Testing
 *Property-Based Testing extension: Partial — applies here to pure functions & serialization round-trip (per requirements.md Extension Configuration)*
-- [ ] `tests/domain/rules.test.ts` — example-based tests for `applyFeed`, `applyPlay`, `applyRest`/`applyRestTick`, `computeHealth`, `computeMood` (priority order), `applyCooldownCountdown`
-- [ ] `tests/domain/rules.property.test.ts` — fast-check property tests: all stat fields always stay within `[STAT_MIN, STAT_MAX]` after any sequence of `tick`/`applyFeed`/`applyPlay`/`applyRest` operations (clamping invariant)
-- [ ] `tests/domain/persistence.test.ts` — example tests: corrupted/missing `localStorage` falls back to new-pet default
-- [ ] `tests/domain/persistence.property.test.ts` — fast-check property test: `loadState(saveState(x)) === x` round-trip for arbitrary valid `PetState`
+- [x] `tests/domain/rules.test.ts` — example-based tests for `applyFeed`, `applyPlay`, `applyRest`/`applyRestTick`, `computeHealth`, `computeMood` (priority order), `applyCooldownCountdown`
+- [x] `tests/domain/rules.property.test.ts` — fast-check property tests: all stat fields always stay within `[STAT_MIN, STAT_MAX]` after any sequence of `tick`/`applyFeed`/`applyPlay`/`applyRest` operations (clamping invariant)
+- [x] `tests/domain/persistence.test.ts` — example tests: corrupted/missing `localStorage` falls back to new-pet default
+- [x] `tests/domain/persistence.property.test.ts` — fast-check property test: `loadState(saveState(x)) === x` round-trip for arbitrary valid `PetState`
 
 ### Step 4: Business Logic Summary
-- [ ] Write `aidlc-docs/construction/virtual-pet-web-app/code/business-logic-summary.md` documenting files created and test coverage
+- [x] Write `aidlc-docs/construction/virtual-pet-web-app/code/business-logic-summary.md` documenting files created and test coverage
 
 ### Step 5: Frontend Components Generation
 *Traces: FR7, NFR2 — frontend-components.md*
-- [ ] `src/components/StatBar.tsx` — reusable stat bar (`label`, `value`, `isDetrimental` props), `data-testid="stat-bar-{label}"`
-- [ ] `src/components/PetDisplay.tsx` — mood image/emoji + label lookup table, `data-testid="pet-display"`
-- [ ] `src/components/ActionPanel.tsx` — Feed/Play/Rest buttons with disabled + countdown display, `data-testid="action-panel-feed-button"` / `-play-button` / `-rest-button`
-- [ ] `src/App.tsx` — root component: `useState` lazy-init from `loadState()`, tick `useInterval`/`useEffect`, action handlers, persistence `useEffect`, composes `PetDisplay` + 4x `StatBar` + `ActionPanel`
-- [ ] `src/assets/` — simple emoji/placeholder mood art mapping (no copyrighted imagery, per FR7 resolution)
-- [ ] `src/main.tsx`, `src/index.css` — app entry point and minimal styling
+- [x] `src/components/StatBar.tsx` — reusable stat bar (`label`, `value`, `isDetrimental` props), `data-testid="stat-bar-{label}"`
+- [x] `src/components/PetDisplay.tsx` — mood image/emoji + label lookup table, `data-testid="pet-display"`
+- [x] `src/components/ActionPanel.tsx` — Feed/Play/Rest buttons with disabled + countdown display, `data-testid="action-panel-feed-button"` / `-play-button` / `-rest-button`
+- [x] `src/App.tsx` — root component: `useState` lazy-init from `loadState()`, tick `useInterval`/`useEffect`, action handlers, persistence `useEffect`, composes `PetDisplay` + 4x `StatBar` + `ActionPanel`
+- [x] `src/assets/` — simple emoji/placeholder mood art mapping (no copyrighted imagery, per FR7 resolution)
+- [x] `src/main.tsx`, `src/index.css` — app entry point and minimal styling
 
 ### Step 6: Frontend Components Unit Testing
-- [ ] `tests/components/StatBar.test.tsx` — renders value, applies correct color direction for `isDetrimental`
-- [ ] `tests/components/PetDisplay.test.tsx` — renders correct image/label per mood
-- [ ] `tests/components/ActionPanel.test.tsx` — buttons disabled during cooldown/resting, click fires callback when enabled, countdown text shown
-- [ ] `tests/App.test.tsx` — integration-style: initial render shows default pet when no saved state; clicking Feed updates Hunger stat display
+- [x] `tests/components/StatBar.test.tsx` — renders value, applies correct color direction for `isDetrimental`
+- [x] `tests/components/PetDisplay.test.tsx` — renders correct image/label per mood
+- [x] `tests/components/ActionPanel.test.tsx` — buttons disabled during cooldown/resting, click fires callback when enabled, countdown text shown
+- [x] `tests/App.test.tsx` — integration-style: initial render shows default pet when no saved state; clicking Feed updates Hunger stat display
 
 ### Step 7: Frontend Components Summary
-- [ ] Write `aidlc-docs/construction/virtual-pet-web-app/code/frontend-components-summary.md` documenting components, test coverage, and how they map to frontend-components.md
+- [x] Write `aidlc-docs/construction/virtual-pet-web-app/code/frontend-components-summary.md` documenting components, test coverage, and how they map to frontend-components.md
 
 ### Step 8: Documentation Generation
-- [ ] `README.md` (workspace root) — project description, how to run (`npm install`, `npm run dev`), how to test (`npm test`), tunable constants pointer (`src/domain/constants.ts`)
+- [x] `README.md` (workspace root) — project description, how to run (`npm install`, `npm run dev`), how to test (`npm test`), tunable constants pointer (`src/domain/constants.ts`)
 
 ### Step 9: Deployment Artifacts Generation
-- [ ] N/A — static client-only app (NFR5: no cloud hosting/backend). `npm run build` (already provided by Vite scaffold) is the only "deployment artifact"; no additional config needed. Documented as N/A in code summary, not skipped silently.
+- [x] N/A — static client-only app (NFR5: no cloud hosting/backend). `npm run build` (already provided by Vite scaffold) is the only "deployment artifact"; no additional config needed. Documented as N/A in code summary, not skipped silently.
 
 ## Steps Not Applicable (and why)
 - **API Layer Generation/Testing/Summary** — no backend (NFR1, NFR3)
