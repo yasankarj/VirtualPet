@@ -21,6 +21,8 @@ All numeric constants below should be implemented as named, easily-tunable const
 | `CRITICAL_HUNGER_THRESHOLD` / `HAPPY_HUNGER_THRESHOLD` / `CRITICAL_HAPPINESS_THRESHOLD` / `HAPPY_HAPPINESS_THRESHOLD` / `CRITICAL_ENERGY_THRESHOLD` / `HAPPY_ENERGY_THRESHOLD` / `SICK_HEALTH_THRESHOLD` | 80 / 40 / 20 / 60 / 20 / 60 / 20 | Q7: A; unchanged by the rebalance (FR-RB5 — neglect consequences stay exactly as strong as before) |
 | `FEED_HUNGER_GRACE_MS` | **2000 (2 seconds)** | Decay Pacing FR-DP2 — strictly less than `FEED_COOLDOWN_MS` (3000) |
 | `PLAY_HAPPINESS_GRACE_MS` | **3000 (3 seconds)** | Decay Pacing FR-DP3 — strictly less than `PLAY_COOLDOWN_MS` (5000) |
+| `DEFAULT_PET_NAME` | **"Pet"** (new) | Refresh/Naming FR-NR4 |
+| `MAX_PET_NAME_LENGTH` | **20** (new) | Refresh/Naming FR-NR6, Q6:A |
 
 `ACTION_COOLDOWN_MS` is retired, replaced by the independent `FEED_COOLDOWN_MS` and `PLAY_COOLDOWN_MS` above.
 
@@ -79,6 +81,21 @@ Priority exists because multiple conditions can be true at once (e.g. both hungr
 ## Clamping Rule
 `clamp(x) = max(STAT_MIN, min(STAT_MAX, x))` — applied after every stat mutation (decay, action effects, rest regen, health rule).
 
+## Name Validation Rule (new — Refresh/Naming FR-NR6)
+`validateName(raw: string): string | null`
+- Trim leading/trailing whitespace from `raw`.
+- If the trimmed result has length 0, or length > `MAX_PET_NAME_LENGTH` (20), the name is **invalid**: return `null`.
+- Otherwise return the trimmed string as the valid name.
+This is the single source of truth for name validity — both the initial naming prompt and the Rename dialog call it before accepting a submission (Q4:A — invalid submissions are rejected with an inline message, not silently coerced).
+
+## Rename Rule (new — Refresh/Naming FR-NR5/FR-NR6)
+Preconditions: none (FR-NR5 — usable any time, not gated by cooldowns/resting/grace state).
+Effect: `name = validateName(newName)`. If `validateName` returns `null`, this is a **defensive no-op** (state unchanged) — mirrors the existing no-op-on-invalid-precondition pattern used by `applyFeed`/`applyPlay`/`applyRest`. In practice the UI always validates before calling this (Q4:A), so the no-op path only guards against being called incorrectly.
+
+## Reset Rule / "Refresh" (new — Refresh/Naming FR-NR1/FR-NR2)
+Preconditions: none — always available, no confirmation (NFR-NR3).
+Effect: produces a fresh pet exactly as `createNewPet` would for a brand-new pet — `stats` reset to `NEW_PET_STARTING_STATS`, both `cooldowns` to 0, both `graces` to 0, `isResting = false`, `restRemainingMs = 0` — **except `name`, which is carried over unchanged** from the pet being reset (Clarification Q1:A). This is intentionally the *only* difference from creating a brand-new pet: Reset never touches `name`, and never re-triggers the naming prompt (that stays gated purely by first-launch detection, `domain-entities.md`).
+
 ## ✅ Design Note — Balance Caveat Resolved (Hunger/Feed Rebalance; strengthened by Decay Pacing)
 The original constants (`FEED_HUNGER_DELTA=-15` on a shared 5s cooldown) guaranteed Hunger climbed to maximum regardless of play quality (`-15 + 5x5 = +10` net per cycle), permanently pinning Health critical. This has been rebalanced — see `hunger-feed-rebalance-requirements.md` for the full analysis — and further strengthened by the Decay Pacing change's grace periods (`hunger-decay-pacing-requirements.md`). The invariants below form the ongoing design contract for this rule set and should be preserved by any future tuning:
 
@@ -90,3 +107,5 @@ The original constants (`FEED_HUNGER_DELTA=-15` on a shared 5s cooldown) guarant
 - **Grace bounded below cooldown** (FR-DP2/FR-DP3, new): `FEED_HUNGER_GRACE_MS < FEED_COOLDOWN_MS` and `PLAY_HAPPINESS_GRACE_MS < PLAY_COOLDOWN_MS` must always hold, so at least one real decay tick still lands between consecutive optimally-timed actions — grace smooths decay, it must never fully freeze it.
 
 These invariants should be encoded as simulation-based tests (NFR-RB1/NFR-DP2) rather than checked only by single-value assertions, since they depend on the interaction of several constants together — see the Code Generation plan for the specific scenarios.
+
+**Reset does not touch this design contract** (NFR-NR2, Refresh/Naming): the Reset Rule above only ever sets stats/cooldowns/graces/resting back to the same starting values `createNewPet` already uses — it introduces no new decay/action math, so none of the invariants above are affected by this change.

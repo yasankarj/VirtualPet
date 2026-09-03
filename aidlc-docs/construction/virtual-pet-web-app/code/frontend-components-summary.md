@@ -25,5 +25,29 @@
 ## Traceability
 FR7 (visual representation, stat display), NFR2 (single-page layout, obvious cooldown state).
 
+## Refresh Game & Pet Naming/Renaming (2026-09-03)
+
+### Files Modified/Created
+| File | Maps to (frontend-components.md) |
+|---|---|
+| `src/components/NameDialog.tsx` (new) | `NameDialog` — themed modal, shared by first-launch naming and rename via `mode` prop |
+| `src/components/RefreshButton.tsx` (new) | `RefreshButton` — single no-confirmation control at the bottom of the page |
+| `src/components/PetDisplay.tsx` | Now shows the pet's name plus a Rename control alongside the mood art |
+| `src/App.tsx` | New `showNamingPrompt`/`showRenameDialog` state, `handleRefresh`, composes the two new components |
+| `src/index.css` | Themed modal styling (animated entrance, close button, input, inline error), pet name row, Refresh button styling |
+
+New `data-testid`s: `pet-display-name`, `pet-display-rename-button`, `refresh-button`, `name-dialog`, `name-dialog-input`, `name-dialog-save-button`, `name-dialog-close-button`, `name-dialog-error`.
+
+### Test Coverage
+| File | Covers |
+|---|---|
+| `tests/components/PetDisplay.test.tsx` | Renders the pet's name; rename button fires `onRenameClick` |
+| `tests/components/NameDialog.test.tsx` | Mode-driven heading/labels; valid save trims and calls `onSave`; empty/whitespace-only submission shows inline error without calling `onSave`; input capped at `MAX_PET_NAME_LENGTH`; close button calls `onDismiss`; rename mode pre-fills from `currentName` |
+| `tests/components/RefreshButton.test.tsx` | Click fires `onRefresh` |
+| `tests/App.naming.test.tsx` | End-to-end naming/rename/refresh flows through `App` (see `business-logic-summary.md` for the full list) |
+
+### Traceability
+FR-NR1 (Refresh control), FR-NR3–FR-NR5 (naming/rename UI), FR-NR6 (inline validation feedback).
+
 ## Deployment Artifacts (Step 9)
 N/A — static client-only app (NFR5: no cloud hosting, no backend). `npm run build` (Vite scaffold, `package.json` script) produces the static `dist/` bundle; no additional deployment configuration is required for this learning project.

@@ -27,6 +27,29 @@ Property-based scope matches the Requirements Analysis extension decision: pure 
 ## Traceability
 FR1 (stats), FR2 (decay), FR3 (actions/cooldowns), FR4 (neglect → Health decline, no death), FR5 (persistence, no closed-time catch-up), FR7 (mood derivation), NFR4 (tunable constants).
 
+## Refresh Game & Pet Naming/Renaming (2026-09-03)
+
+### Files Modified/Created
+| File | Change |
+|---|---|
+| `src/domain/types.ts` | Added `name: string` to `PetState` |
+| `src/domain/constants.ts` | Added `DEFAULT_PET_NAME = "Pet"`, `MAX_PET_NAME_LENGTH = 20`; bumped `PET_STATE_STORAGE_KEY` to `virtualPet.state.v3` |
+| `src/domain/factory.ts` | `createNewPet(name: string = DEFAULT_PET_NAME)` now includes `name` |
+| `src/domain/rules.ts` | New: `validateName`, `renamePet`, `resetPet` |
+| `src/domain/persistence.ts` | `isValidPetState` requires `name: string`; new `hasSavedPet()` for first-launch detection |
+| `src/App.tsx` | New `showNamingPrompt`/`showRenameDialog` state, `handleRefresh`, wiring for `NameDialog`/`RefreshButton` |
+
+### Test Coverage
+| File | Covers |
+|---|---|
+| `tests/domain/rules.test.ts` | `validateName` (trim/empty/over-limit/exact-limit), `renamePet` (valid + no-op on invalid), `resetPet` (full reset except name preserved) |
+| `tests/domain/persistence.test.ts` | Missing `name` field falls back to a fresh pet; `hasSavedPet` true/false cases |
+| `tests/domain/rules.property.test.ts`, `tests/domain/persistence.property.test.ts` | `petStateArb` extended with a `name` generator |
+| `tests/App.naming.test.tsx` | First-launch prompt appears/doesn't reappear, skip assigns default, valid save persists, invalid submission shows inline error and stays open; rename open/pre-fill/cancel/save; refresh resets stats+cooldowns, preserves name, no confirmation dialog |
+
+### Traceability
+FR-NR1–FR-NR7 (Refresh + naming/renaming), NFR-NR1 (storage key bump, `.v2`→`.v3`, no migration), NFR-NR2 (no regression to prior balance/pacing invariants), NFR-NR3 (no confirmation on Refresh, by design).
+
 ## Hunger/Feed Rebalance (2026-09-03)
 `FEED_HUNGER_DELTA` -15→-20; `PLAY_HAPPINESS_DELTA` +20→+30; `PLAY_HUNGER_DELTA` +15→+8; shared `ACTION_COOLDOWN_MS` (5000) split into `FEED_COOLDOWN_MS` (3000) and `PLAY_COOLDOWN_MS` (5000); `applyDecay` now suspends Hunger/Happiness (not just Energy) while resting. Resolves the guaranteed Hunger-climbs-to-max issue flagged in the original "Balance Caveat" note — see `aidlc-docs/construction/virtual-pet-web-app/functional-design/business-rules.md` and `aidlc-docs/inception/requirements/hunger-feed-rebalance-requirements.md` (FR-RB1–FR-RB5) for the full design contract.
 

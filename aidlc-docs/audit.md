@@ -409,3 +409,128 @@
 **Context**: Code Generation stage (unit: virtual-pet-web-app), Part 1 Planning complete. Gate: awaiting user approval before Part 2 (actual code generation).
 
 ---
+
+## New Change Request - Refresh Game & Pet Naming/Renaming
+**Timestamp**: 2026-09-03T15:00:00Z
+**User Input**: "I need these features.\n1. Ability to refresh the game\n2. When starting the game, user should be able to name / rename the pet!\nLet's plan this out!"
+**AI Response**: "Resuming existing AI-DLC project (previously COMPLETE through Decay Pacing change/Operations placeholder). Treating this as a new pass through Requirements Analysis (Standard depth) for a New Feature request bundling two related capabilities: (1) a way to refresh/reset the game, (2) naming the pet at start plus the ability to rename it later. Reviewed current implementation: PetState (src/domain/types.ts) has no name field, factory.ts/persistence.ts have no reset/rename support, and there is no existing refresh control in App.tsx or ActionPanel.tsx. Both features are net-new. Identified ambiguity in what 'refresh' should mean (full reset vs. soft reload vs. stats-only reset) and how naming/renaming and refresh interact. Drafting clarifying questions before writing requirements. No code changes made."
+**Context**: INCEPTION PHASE (re-entered) - Requirements Analysis for new change request. Gate: will create clarifying-questions file and await answers before proceeding.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Clarifying Questions Answered, Ambiguity Detected
+**Timestamp**: 2026-09-03T15:10:00Z
+**User Input**: "Done" — answers recorded in naming-and-refresh-questions.md: Q1:C (Refresh = stat reset only, keeps name), Q2:D Other ("At the bottom" — placement, non-blocking), Q3:B (no confirmation dialog), Q4:A (naming prompt only on first-ever launch with no saved pet), Q5:A (dedicated Rename control, usable any time), Q6:A (non-empty, trimmed, 20-char limit), Q7:A (default name "Pet" if skipped), Q8:A (name persists in localStorage with PetState).
+**AI Response**: "No contradictions detected. One ambiguity found: Q1:C ('Stat reset only... resets Hunger/Happiness/Energy/Health... keeps the existing pet name') does not say whether Refresh also clears action cooldowns, decay graces, and Resting state, or leaves them untouched while only the four stat numbers change. Created naming-and-refresh-clarification-questions.md with one targeted question to resolve this before writing requirements.md."
+**Context**: Requirements Analysis stage (Refresh/Naming change) - mandatory ambiguity check per question-format-guide.md. Gate: awaiting clarification answer.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Clarification Answered, Requirements Written
+**Timestamp**: 2026-09-03T15:20:00Z
+**User Input**: "Done" (naming-and-refresh-clarification-questions.md: Clarification Q1 = A — Refresh also clears cooldowns/graces and stops Resting, in addition to resetting stats; name still preserved)
+**AI Response**: "No further contradictions. Generated aidlc-docs/inception/requirements/naming-and-refresh-requirements.md: FR-NR1/FR-NR2 (no-confirmation Refresh control at the bottom of the app, resets stats+cooldowns+graces+Resting, preserves name), FR-NR3/FR-NR4 (one-time first-launch naming prompt, defaults to 'Pet' if skipped), FR-NR5/FR-NR6 (always-available separate Rename control, name validated to non-empty/trimmed/<=20 chars), FR-NR7 (name persisted in PetState), NFR-NR1 (storage key version bump, no migration, consistent with the existing .v1->.v2 policy), NFR-NR2 (no regression to existing balance/pacing invariants), NFR-NR3 (documented accepted-risk: no confirmation on Refresh, by design). Updated aidlc-docs/aidlc-state.md with a new 'Change Request: Refresh Game & Pet Naming/Renaming' section."
+**Context**: Requirements Analysis stage COMPLETE for this change request. Gate: awaiting explicit user approval before proceeding to User Stories (optional) / Workflow Planning.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Requirements Approved
+**Timestamp**: 2026-09-03T15:25:00Z
+**User Input**: "Approve & Continue - proceed to Workflow Planning"
+**AI Response**: "Requirements approved; User Stories declined implicitly (user proceeded straight to Workflow Planning, not Add User Stories). Proceeding to Workflow Planning stage for this change request."
+**Context**: Requirements Analysis stage APPROVED. User Stories SKIPPED. Moving to Workflow Planning.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Workflow Planning
+**Timestamp**: 2026-09-03T15:30:00Z
+**User Input**: N/A (automated stage, following approval to proceed)
+**AI Response**: "Performed change impact and risk analysis (Risk: Medium — second change in this series to touch the persisted PetState shape, plus two brand-new UI flows: first-launch naming and rename). Determined phase plan: Application Design SKIP, Units Generation SKIP, Functional Design EXECUTE (new business logic: reset semantics keeping name, name validation, first-launch detection, .v2->.v3 persisted shape, where the pet name is displayed since it currently isn't shown anywhere in the UI), NFR Requirements/Design SKIP (extends existing NFR4/NFR5, no new category), Infrastructure Design SKIP, Code Generation + Build and Test ALWAYS. Generated aidlc-docs/inception/plans/naming-and-refresh-execution-plan.md with Mermaid workflow visualization (validated syntax + text alternative per content-validation.md). Updated aidlc-state.md Change Request section stage progress."
+**Context**: Workflow Planning stage COMPLETE for this change request. Gate: awaiting explicit user approval before proceeding to Functional Design.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Workflow Planning Approved
+**Timestamp**: 2026-09-03T15:35:00Z
+**User Input**: "Approve & Continue - proceed to Functional Design"
+**AI Response**: "Execution plan approved as proposed (Application Design, Units Generation, NFR Requirements/Design, Infrastructure Design all skipped). Proceeding to Functional Design (unit: virtual-pet-web-app) to design the reset operation, name validation, first-launch detection, persisted shape, and UI structure."
+**Context**: Workflow Planning APPROVED. Moving to CONSTRUCTION PHASE - Functional Design.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Functional Design Plan & Questions Presented
+**Timestamp**: 2026-09-03T15:40:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Created aidlc-docs/construction/plans/naming-and-refresh-functional-design-plan.md with an 8-item design-task checklist and 4 clarifying questions covering dialog presentation (modal vs inline), the skip affordance for initial naming, whether Rename reuses the naming component, and invalid-name feedback. Other design decisions (first-launch detection via loadState's fallback path, resetPet/renamePet/validateName living in rules.ts, factory.createNewPet gaining an optional name parameter, persistence.ts validator + .v3 key bump) are unambiguous extensions of existing patterns and will be written up directly in Part 2 without a Q&A round, consistent with how prior changes handled derivable design decisions. Awaiting user answers."
+**Context**: Functional Design stage (unit: virtual-pet-web-app), Steps 2-4 - gate: awaiting user answers.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Functional Design Answers Received & Artifacts Generated
+**Timestamp**: 2026-09-03T15:50:00Z
+**User Input**: "done" — naming-and-refresh-functional-design-plan.md answers: Q1:C (modal overlay, but game-friendly/not a typical web-app modal), Q2:C (a large cross/close button skips naming), Q3:A (shared reusable component, mode-driven), Q4:A (inline error message, dialog stays open).
+**AI Response**: "No contradictions detected. Q1's 'game-friendly, interesting' direction is a creative/styling brief rather than a blocking ambiguity - proceeded to design a themed modal (rounded frame, animated entrance, mood-art-consistent styling, playful heading) and will present it for review at this stage's approval gate, consistent with how the original mood-art styling brief was handled. Q2's answer resolved the skip mechanism concretely (large x/close control instead of a text 'Skip' button); decided Escape mirrors it and backdrop-click does not (documented rationale: avoid accidental data loss), as a reasonable non-blocking extension. Generated: domain-entities.md (name field on PetState, persisted-shape JSON updated, storage key bumped to .v3, new hasSavedPet()-based first-launch-detection note), business-rules.md (DEFAULT_PET_NAME/MAX_PET_NAME_LENGTH constants, new Name Validation Rule, Rename Rule, Reset Rule, NFR-NR2 note on the design contract), business-logic-model.md (First-Launch Detection process, Naming Action, Rename Action, Refresh Action, updated Persistence Process and Data Flow diagram and Error Handling), frontend-components.md (updated hierarchy/state management, new RefreshButton and NameDialog components, updated PetDisplay props to show the pet's name plus a Rename control, Form Validation section now applicable). Marked all functional design plan checkboxes [x] complete."
+**Context**: Functional Design stage (unit: virtual-pet-web-app) COMPLETE for this change. Gate: awaiting explicit user approval before proceeding to Code Generation.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Functional Design Approved
+**Timestamp**: 2026-09-03T15:55:00Z
+**User Input**: "Continue to Next Stage - proceed to Code Generation"
+**AI Response**: "Functional design approved. Proceeding to Code Generation (unit: virtual-pet-web-app) Part 1 (Planning)."
+**Context**: Functional Design APPROVED. Moving to Code Generation.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Code Generation Plan (Part 1)
+**Timestamp**: 2026-09-03T16:00:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Reviewed existing test suite (rules.test.ts, persistence.test.ts, App.test.tsx, App.timing.test.tsx, property tests) before planning: found that App.test.tsx and App.timing.test.tsx render a fresh <App/> with only localStorage.clear() in beforeEach, which will now trigger the first-launch naming modal on every render - decided to seed a saved pet in those beforeEach blocks so the pre-existing tests (unrelated to naming) keep testing their original concern cleanly, and added a dedicated new tests/App.naming.test.tsx for the naming/rename/refresh flows themselves. Also found petStateArb in both property test files needs a name field to type-check, same pattern as the prior graces-field fix. Created aidlc-docs/construction/plans/naming-and-refresh-code-generation-plan.md with 20 steps covering domain layer (types/constants/factory/rules/persistence), domain tests, frontend layer (new NameDialog and RefreshButton components, updated PetDisplay and App.tsx, new CSS), frontend tests, and documentation updates. Presenting plan for approval before generation."
+**Context**: Code Generation stage (unit: virtual-pet-web-app), Part 1 Planning complete. Gate: awaiting user approval before Part 2 (actual code generation).
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Code Generation Plan Approved
+**Timestamp**: 2026-09-03T16:05:00Z
+**User Input**: "approve and continue"
+**AI Response**: "Plan approved. Proceeding to Part 2 - executing the 20 steps in order."
+**Context**: Code Generation Part 1 (Planning) APPROVED. Beginning Part 2 (Generation).
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Code Generation (Part 2 Complete)
+**Timestamp**: 2026-09-03T16:20:00Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Executed all 20 plan steps: types.ts (name field), constants.ts (DEFAULT_PET_NAME/MAX_PET_NAME_LENGTH, storage key bumped to .v3), factory.ts (createNewPet accepts optional name), rules.ts (validateName/renamePet/resetPet), persistence.ts (validator requires name, new hasSavedPet()), 6 domain test files updated/extended; new src/components/NameDialog.tsx (shared, mode-driven modal) and RefreshButton.tsx, PetDisplay.tsx updated (name + rename control), App.tsx wired (showNamingPrompt/showRenameDialog state, handleRefresh), index.css themed modal/name-row/refresh-button styles; 5 frontend test files updated/added including a new tests/App.naming.test.tsx covering first-launch/skip/save/invalid/rename/refresh end-to-end; updated business-logic-summary.md and frontend-components-summary.md. Ran npm test: all 87 tests pass (was 54, +33 across domain and frontend). Ran npm run build: tsc + vite build succeed with no errors. Ran a headless Chromium smoke test against the live dev server: confirmed the naming modal appears on first launch, saving a name persists and never re-shows the prompt across a reload, rename pre-fills/cancels/saves correctly, an invalid (whitespace-only) name shows the inline error, and Refresh immediately resets Hunger/Feed-cooldown while preserving the pet's name with no confirmation dialog - zero console errors throughout. Cleaned up the temporary smoke-test script and stopped the dev server."
+**Context**: Code Generation stage (unit: virtual-pet-web-app) Part 2 COMPLETE for this change, verified via test suite, build, and live browser check. Gate: awaiting explicit user approval before proceeding to Build and Test.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Code Generation Approved
+**Timestamp**: 2026-09-03T16:25:00Z
+**User Input**: "Approve and continue"
+**AI Response**: "Code Generation approved for unit virtual-pet-web-app (Refresh Game & Pet Naming/Renaming change). Proceeding to Build and Test."
+**Context**: Code Generation APPROVED. Moving to Build and Test.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Build and Test Stage
+**Timestamp**: 2026-09-03T16:35:00Z
+**Build Status**: Success
+**Test Status**: Pass (87/87 unit, 5/5 integration/smoke)
+**Files Updated**:
+- build-and-test/unit-test-instructions.md (counts + new "Verified Result" entry)
+- build-and-test/integration-test-instructions.md (new Scenario 4 - full naming/rename/refresh UI flow - and Scenario 5 - old .v2->.v3 save fallback - + new "Verified Result" entry)
+- build-and-test/build-and-test-summary.md (new "Refresh Game & Pet Naming/Renaming" section)
+**AI Response**: "Ran the explicit old-.v2-save fallback check called out in the execution plan's success criteria (mirroring the .v1->.v2 check done for Decay Pacing), which had not yet been done as a live-browser check: wrote a pre-this-change-shaped save under the old .v2 key via a headless browser, reloaded, confirmed the app shows the naming prompt (correctly treating it as a first launch, since no valid .v3 save exists) and a fresh default pet (Hunger 10) rather than the old save's stale values (Hunger 77) - no crash, no console errors. Re-ran the full npm test suite (87/87) and npm run build (clean) immediately beforehand as a clean-state re-verification. Re-ran the full naming/rename/refresh browser flow (Scenario 4) as a dedicated integration scenario, distinct from the ad-hoc smoke test already done during Code Generation. Updated the existing build-and-test docs in place with dated sections (same pattern as every prior change). Cleaned up temporary scripts and stopped the dev server each time."
+**Context**: Build and Test stage COMPLETE for the Refresh Game & Pet Naming/Renaming change. Gate: awaiting explicit user approval.
+
+---
+
+## Refresh Game & Pet Naming/Renaming - Build and Test Approved
+**Timestamp**: 2026-09-03T16:40:00Z
+**User Input**: "Approve & Continue - proceed to Operations"
+**AI Response**: "Build and Test approved. Proceeding to Operations phase, which remains a placeholder (no deployment/monitoring workflow defined). Refresh Game & Pet Naming/Renaming change is complete through Build and Test."
+**Context**: Build and Test APPROVED. CONSTRUCTION PHASE COMPLETE for this change. Moving to OPERATIONS PHASE (placeholder).
+
+---

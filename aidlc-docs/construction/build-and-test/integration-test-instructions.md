@@ -33,6 +33,26 @@ This is a **single-unit, client-only application** (`virtual-pet-web-app`) — t
 - **Expected Results**: The app shows a fresh default pet (`Hunger: 10`, `Happiness: 80`, etc.) — the old `.v1` data under the old key is never read (the app only ever reads `.v2`); no console errors.
 - **Cleanup**: `localStorage.clear()`, stop the dev server.
 
+### Scenario 4: Naming, Rename, and Refresh flows through the full UI (Refresh Game & Pet Naming/Renaming)
+- **Description**: Confirms the naming/rename/refresh feature works end-to-end through real browser rendering and events, not just component-level tests.
+- **Setup**: `npm run dev`, `localStorage.clear()`.
+- **Test Steps**:
+  1. Load the page with nothing saved; confirm the naming modal (`name-dialog`) appears.
+  2. Enter a name and save; confirm the modal closes and `pet-display-name` shows it.
+  3. Reload the page; confirm the modal does **not** reappear and the name persisted.
+  4. Click the Rename control; confirm the dialog pre-fills with the current name; change it and save; confirm the displayed name updates and persists across a reload.
+  5. Open Rename again, type a whitespace-only name, click Save; confirm an inline error appears and the dialog stays open; close via the × button and confirm the name is unchanged.
+  6. Click Feed to move stats/cooldown off their defaults, then click Refresh; confirm — with **no confirmation dialog** — stats and the Feed cooldown reset to fresh-pet defaults while the pet's name is unchanged.
+- **Expected Results**: All of the above hold; no browser console errors at any step.
+- **Cleanup**: `localStorage.clear()`, stop the dev server.
+
+### Scenario 5: Old `.v2` save data falls back cleanly under the new `.v3` key (Refresh Game & Pet Naming/Renaming)
+- **Description**: Confirms the storage-key bump (`virtualPet.state.v2` -> `.v3`, introduced by this change's NFR-NR1) behaves per the same documented no-migration policy as Scenario 3, and — since the app has no record of ever naming this "pet" — correctly treats it as a first launch.
+- **Setup**: `npm run dev`; write an old `.v2`-shaped object (no `name` field) to `localStorage` under the key `"virtualPet.state.v2"`.
+- **Test Steps**: Reload the page.
+- **Expected Results**: The naming prompt appears (the app has no valid save under the current `.v3` key, so this is indistinguishable from a genuine first launch); dismissing it shows a fresh default pet (`Hunger: 10`) — the old `.v2` save's values (e.g. `Hunger: 77`) never leak through; no console errors.
+- **Cleanup**: `localStorage.clear()`, stop the dev server.
+
 ## Setup Integration Test Environment
 
 ### 1. Start Required Services
@@ -65,3 +85,6 @@ Re-ran both scenarios against the rebalanced constants. `tests/App.test.tsx` pas
 
 ## Verified Result (2026-09-03, Decay Pacing change)
 Re-ran Scenario 1 (`tests/App.test.tsx`, still 2/2, plus the new `tests/App.timing.test.tsx`, 1/1). Scenario 2 re-run headlessly with a longer observation window: idled 2.2s (Hunger ticked up twice, `10 -> 20` as expected), clicked Feed (Hunger `20 -> 0`, clamped), then confirmed Hunger stayed at exactly `0` for a full ~3 seconds afterward (600ms and again checked before the grace period expired) before ticking to `5` at the ~3.1s mark — proving both the clock-restart (FR-DP1) and the grace period (FR-DP2) are live end-to-end, not just correct in isolated unit tests. Scenario 3 (new) run headlessly: wrote an old `.v1`-shaped save (no `graces`) under the old key, reloaded, confirmed the app showed a fresh default pet (`Hunger: 10`, `Happiness: 80`) rather than the old save's `77`/`33` values. Zero browser console errors across all scenarios.
+
+## Verified Result (2026-09-03, Refresh Game & Pet Naming/Renaming change)
+Scenario 4 (new) run headlessly end-to-end: naming modal appeared on first load; saving "Rex" closed it and displayed the name; reload did not re-show the prompt and "Rex" persisted; Rename pre-filled "Rex", changing to "Buddy" and saving updated and persisted it; submitting a whitespace-only name showed the inline error and kept the dialog open, and closing via × left the name unchanged at "Buddy"; clicking Feed (cooldown became `Feed (3s)`) then Refresh instantly reset Hunger to `10` and the Feed button back to enabled, with **no confirmation dialog** at any point, and the name stayed "Buddy" throughout. Scenario 5 (new) run headlessly: wrote an old `.v2`-shaped save (`Hunger: 77`, no `name` field) under the old `virtualPet.state.v2` key, reloaded — the naming prompt correctly appeared (the app has no valid `.v3` save, so this reads as a first launch), and dismissing it showed a fresh default pet (`Hunger: 10`); the old save's `77` never leaked through. Zero browser console errors across both new scenarios. Also re-confirmed Scenario 1 (`tests/App.test.tsx`, 2/2) and re-ran the full `npm test` suite (87/87) immediately beforehand.

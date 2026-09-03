@@ -107,3 +107,37 @@ Ready to proceed to the Operations phase (currently a placeholder in this workfl
 - **Pacing invariants (FR-DP1–FR-DP6)**: Verified — see `tests/domain/rules.balance.test.ts`, `tests/App.timing.test.tsx`, and the resolved Design Note in `business-rules.md`; all prior FR-RB1–FR-RB5 sustainability invariants re-verified and strengthened, never loosened
 - **Persistence versioning (NFR-DP3)**: Verified live — old `.v1` saves fall back cleanly to a fresh pet under the new `.v2` key
 - **Ready for Operations**: Yes (no change to operational posture — still a placeholder)
+
+---
+
+## Refresh Game & Pet Naming/Renaming (2026-09-03)
+
+### Build Status
+- **Build Status**: Success — `tsc -b && vite build`, 0 errors, `dist/` output ~150.17 kB JS / 48.13 kB gzip, ~2.70 kB CSS (new modal/name/refresh styles)
+
+### Test Execution Summary
+
+#### Unit Tests
+- **Total Tests**: 87 (was 54) — net +33: 10 new cases in `rules.test.ts` (`validateName`/`renamePet`/`resetPet`), 4 new cases in `persistence.test.ts` (missing-`name` fallback, `hasSavedPet`), 2 new `PetDisplay.test.tsx` cases, 2 new component test files (`NameDialog.test.tsx` — 7 tests, `RefreshButton.test.tsx` — 1 test), 1 new `App.naming.test.tsx` file (9 tests)
+- **Passed**: 87
+- **Failed**: 0
+- **Status**: Pass
+
+#### Integration Tests
+- **Test Scenarios**: 5 (3 existing, re-run; 2 new — full naming/rename/refresh UI flow, and old `.v2`→`.v3` save fallback, per NFR-NR1)
+- **Passed**: 5
+- **Failed**: 0
+- **Status**: Pass — confirmed live in the browser that the naming prompt shows only on a genuine first launch and never reappears once a name (or the default) is saved, rename and validation work end-to-end, Refresh resets stats/cooldowns with no confirmation while preserving the name, and an old `.v2` save correctly falls back to a fresh pet (re-triggering the naming prompt) rather than leaking stale data
+
+#### Additional Tests
+- **Contract/Security/E2E**: Unchanged from original assessment — N/A / covered by the integration scenarios respectively
+
+### Issues Found and Fixed During This Stage
+None found during Build and Test — all issues (test seeding for `App.test.tsx`/`App.timing.test.tsx` to avoid the new naming prompt interfering, `petStateArb` needing a `name` field) were anticipated during Code Generation planning and fixed then; this stage's `npm test`/`npm run build`/live browser re-runs confirmed no regressions.
+
+### Overall Status
+- **Build**: Success
+- **All Tests**: Pass (87/87 unit, 5/5 integration/smoke)
+- **Refresh/Naming requirements (FR-NR1–FR-NR7, NFR-NR1–NFR-NR3)**: Verified — see `tests/domain/rules.test.ts`, `tests/App.naming.test.tsx`, and the updated functional-design docs
+- **No regression to prior invariants (NFR-NR2)**: Confirmed — `rules.balance.test.ts`'s FR-RB1–FR-RB5/FR-DP1–FR-DP6 checks still pass unchanged
+- **Ready for Operations**: Yes (no change to operational posture — still a placeholder)

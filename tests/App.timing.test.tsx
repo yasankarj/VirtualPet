@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import App from "../src/App";
 import { TICK_INTERVAL_MS } from "../src/domain/constants";
+import { createNewPet } from "../src/domain/factory";
+import { saveState } from "../src/domain/persistence";
 
 /**
  * Decay Pacing FR-DP1: the tick timer restarts on every player action, so the next tick
@@ -14,6 +16,9 @@ import { TICK_INTERVAL_MS } from "../src/domain/constants";
 describe("App tick scheduling", () => {
   beforeEach(() => {
     localStorage.clear();
+    // Seed an already-saved pet so the first-launch naming prompt (Refresh/Naming FR-NR3) doesn't
+    // appear — this test predates naming and is about tick-scheduling behavior, not naming.
+    saveState(createNewPet());
     vi.useFakeTimers();
   });
 

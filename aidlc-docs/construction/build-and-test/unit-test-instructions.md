@@ -14,16 +14,17 @@ npm run test:watch
 ```
 
 ### 2. Review Test Results
-- **Expected**: 54 tests pass, 0 failures, across 10 test files.
+- **Expected**: 87 tests pass, 0 failures, across 13 test files.
 - **Test Coverage** (by area):
-  - `tests/domain/rules.test.ts` (27 tests) — Feed/Play/Rest effects and no-op preconditions, Decay Rule while awake/resting/grace-gated, cooldown + grace countdown, Health decline/recovery, full Mood priority order
-  - `tests/domain/rules.property.test.ts` (2 tests) — clamping invariant across arbitrary single ops and sequences (fixture includes `graces`)
+  - `tests/domain/rules.test.ts` (37 tests) — Feed/Play/Rest effects and no-op preconditions, Decay Rule while awake/resting/grace-gated, cooldown + grace countdown, Health decline/recovery, full Mood priority order, `validateName`/`renamePet`/`resetPet`
+  - `tests/domain/rules.property.test.ts` (2 tests) — clamping invariant across arbitrary single ops and sequences (fixture includes `graces` and `name`)
   - `tests/domain/rules.balance.test.ts` (7 tests) — Hunger/Feed Rebalance + Decay Pacing sustainability invariants (FR-RB1–FR-RB5, FR-DP1–FR-DP6), including exact-margin regression checks
-  - `tests/domain/persistence.test.ts` (5 tests) — missing/corrupted/`graces`-missing `localStorage` fallback, valid round-trip
-  - `tests/domain/persistence.property.test.ts` (1 test) — `loadState(saveState(x)) === x` for arbitrary valid state (fixture includes `graces`)
-  - `tests/components/StatBar.test.tsx` (3 tests), `PetDisplay.test.tsx` (2 tests), `ActionPanel.test.tsx` (4 tests)
+  - `tests/domain/persistence.test.ts` (9 tests) — missing/corrupted/`graces`-missing/`name`-missing `localStorage` fallback, valid round-trip, `hasSavedPet`
+  - `tests/domain/persistence.property.test.ts` (1 test) — `loadState(saveState(x)) === x` for arbitrary valid state (fixture includes `graces` and `name`)
+  - `tests/components/StatBar.test.tsx` (3 tests), `PetDisplay.test.tsx` (4 tests), `ActionPanel.test.tsx` (4 tests), `NameDialog.test.tsx` (7 tests), `RefreshButton.test.tsx` (1 test)
   - `tests/App.test.tsx` (2 tests) — default-state render, Feed click updates the UI end-to-end
   - `tests/App.timing.test.tsx` (1 test) — fake-timer proof that the tick clock restarts on Feed (FR-DP1)
+  - `tests/App.naming.test.tsx` (9 tests) — first-launch naming prompt appears/never reappears, skip assigns default, valid save persists, invalid submission shows inline error and stays open, rename open/pre-fill/cancel/save, refresh resets stats+cooldowns while preserving the name with no confirmation
 - **Test Report Location**: Console output from `npm test` (Vitest's default reporter); no separate report file is generated.
 
 ### 3. Fix Failing Tests
@@ -40,3 +41,6 @@ If tests fail:
 
 ## Verified Result (2026-09-03, Decay Pacing change)
 `npm test` was run and passed: **54/54 tests, 10/10 files, 0 failures** (net +7 over the previous 47: 3 new cases in `rules.test.ts`, 2 new exact-margin cases in `rules.balance.test.ts`, 1 new `persistence.test.ts` case, 1 new `App.timing.test.tsx` file). One issue was found and fixed during this pass that wasn't in the original Code Generation plan: `tests/domain/rules.property.test.ts` has its own separate `PetState` fixture builder (distinct from `persistence.property.test.ts`'s) that also needed a `graces` field — fast-check's shrinker immediately surfaced this via a `Cannot read properties of undefined (reading 'hungerGraceRemainingMs')` crash on its first run. Fixed by adding `graces` to that fixture too.
+
+## Verified Result (2026-09-03, Refresh Game & Pet Naming/Renaming change)
+`npm test` was run and passed: **87/87 tests, 13/13 files, 0 failures** (net +33 over the previous 54: 10 new cases in `rules.test.ts` for `validateName`/`renamePet`/`resetPet`, 4 new cases in `persistence.test.ts` including `hasSavedPet`, 2 new component test files — `NameDialog.test.tsx` (7 tests) and `RefreshButton.test.tsx` (1 test) — 2 new `PetDisplay.test.tsx` cases, and a new `App.naming.test.tsx` file (9 tests)). No test bugs were found during this pass; the one thing double-checked was that `tests/App.test.tsx` and `tests/App.timing.test.tsx` (which predate naming and render `<App />` fresh) needed a saved pet seeded in `beforeEach` so the new first-launch naming prompt doesn't interfere with their original, unrelated assertions — done during Code Generation, re-confirmed passing here.

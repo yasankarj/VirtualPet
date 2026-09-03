@@ -1,6 +1,8 @@
+import { createNewPet } from "./factory";
 import {
   STAT_MIN,
   STAT_MAX,
+  MAX_PET_NAME_LENGTH,
   DECAY_PER_TICK,
   FEED_HUNGER_DELTA,
   PLAY_HAPPINESS_DELTA,
@@ -175,4 +177,29 @@ export function applyRest(state: PetState): PetState {
     isResting: true,
     restRemainingMs: REST_DURATION_MS,
   };
+}
+
+/** Name Validation Rule (Refresh/Naming FR-NR6): trims whitespace, requires 1-MAX_PET_NAME_LENGTH chars. */
+export function validateName(raw: string): string | null {
+  const trimmed = raw.trim();
+  if (trimmed.length === 0 || trimmed.length > MAX_PET_NAME_LENGTH) return null;
+  return trimmed;
+}
+
+/**
+ * Rename Rule (Refresh/Naming FR-NR5/FR-NR6): no cooldown/resting precondition — usable any time.
+ * Defensive no-op if the name is invalid (the UI always validates before calling this).
+ */
+export function renamePet(state: PetState, newName: string): PetState {
+  const validated = validateName(newName);
+  if (validated === null) return state;
+  return { ...state, name: validated };
+}
+
+/**
+ * Reset Rule / "Refresh" (Refresh/Naming FR-NR1/FR-NR2): produces a fresh pet — same defaults as
+ * createNewPet — except the current name is carried over unchanged.
+ */
+export function resetPet(state: PetState): PetState {
+  return createNewPet(state.name);
 }
