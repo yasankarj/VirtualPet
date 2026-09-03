@@ -95,3 +95,19 @@
 **Context**: Functional Design stage (unit: virtual-pet-web-app), Steps 5-7 complete. Presenting completion message, awaiting approval.
 
 ---
+
+## Functional Design - Approved
+**Timestamp**: 2026-09-03T00:00:12Z
+**User Input**: "Continue to Next Stage - approve and proceed to Code Generation"
+**AI Response**: "Functional design approved for unit virtual-pet-web-app. Proceeding to Code Generation Part 1 (Planning)."
+**Context**: Functional Design stage COMPLETE (unit: virtual-pet-web-app). Moving to Code Generation.
+
+---
+
+## Code Generation - Plan Created (Part 1: Planning)
+**Timestamp**: 2026-09-03T00:00:13Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Created aidlc-docs/construction/plans/virtual-pet-web-app-code-generation-plan.md — Vite + React + TypeScript stack, Vitest + Testing Library + fast-check for tests. 9 steps: Project Structure Setup, Business Logic Generation/Testing/Summary, Frontend Components Generation/Testing/Summary, Documentation Generation, Deployment Artifacts (N/A, documented). API Layer, Repository Layer, and DB Migration steps excluded as not applicable (no backend, per NFR1/NFR3). Presenting plan and awaiting approval before Part 2 (Generation)."
+**Context**: Code Generation stage (unit: virtual-pet-web-app), Part 1 Steps 1-6 - gate: awaiting explicit user approval before code generation begins.
+
+---

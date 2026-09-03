@@ -4,7 +4,7 @@
 - **Project Name**: Virtual Pet (Tamagotchi)
 - **Project Type**: Greenfield
 - **Start Date**: 2026-09-03T00:00:00Z
-- **Current Stage**: CONSTRUCTION - Functional Design (unit: virtual-pet-web-app)
+- **Current Stage**: CONSTRUCTION - Code Generation (unit: virtual-pet-web-app)
 
 ## Workspace State
 - **Existing Code**: No
@@ -38,11 +38,11 @@
 - [x] Units Generation - SKIPPED (rationale in execution-plan.md)
 
 ### 🟢 CONSTRUCTION PHASE (Unit: virtual-pet-web-app)
-- [ ] Functional Design - IN PROGRESS
-- [ ] NFR Requirements - SKIP
-- [ ] NFR Design - SKIP
-- [ ] Infrastructure Design - SKIP
-- [ ] Code Generation - EXECUTE
+- [x] Functional Design - COMPLETE (approved)
+- [x] NFR Requirements - SKIP
+- [x] NFR Design - SKIP
+- [x] Infrastructure Design - SKIP
+- [ ] Code Generation - IN PROGRESS (Part 1: Planning)
 - [ ] Build and Test - EXECUTE
 
 ### 🟡 OPERATIONS PHASE
@@ -50,6 +50,6 @@
 
 ## Current Status
 - **Lifecycle Phase**: CONSTRUCTION
-- **Current Stage**: Functional Design (unit: virtual-pet-web-app)
-- **Next Stage**: Code Generation
+- **Current Stage**: Code Generation (unit: virtual-pet-web-app) - Part 1: Planning
+- **Next Stage**: Code Generation Part 2 (Generation), then Build and Test
 - **Status**: In progress
