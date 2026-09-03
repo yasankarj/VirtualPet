@@ -71,3 +71,27 @@
 **Context**: Workflow Planning stage, Step 9 - gate: awaiting explicit user approval before proceeding to Functional Design.
 
 ---
+
+## Workflow Planning - Approved
+**Timestamp**: 2026-09-03T00:00:09Z
+**User Input**: "Approve & Continue"
+**AI Response**: "Execution plan approved as proposed (Application Design, Units Generation, NFR Requirements, NFR Design, Infrastructure Design all skipped). Proceeding to Functional Design for unit virtual-pet-web-app."
+**Context**: Workflow Planning stage COMPLETE. Moving to Construction Phase - Functional Design.
+
+---
+
+## Functional Design - Plan & Questions Presented
+**Timestamp**: 2026-09-03T00:00:10Z
+**User Input**: N/A (automated stage)
+**AI Response**: "Created aidlc-docs/construction/plans/virtual-pet-web-app-functional-design-plan.md with a design-task checklist and 9 clarifying questions covering decay tick interval/amount, action magnitudes (Feed/Play/Rest), cooldown duration, Health critical thresholds, starting pet values, and frontend component structure. Awaiting user answers."
+**Context**: Functional Design stage (unit: virtual-pet-web-app), Steps 2-4 - gate: awaiting user answers.
+
+---
+
+## Functional Design - Answers Received & Artifacts Generated
+**Timestamp**: 2026-09-03T00:00:11Z
+**User Input**: "I answered!" then "I just saved it!" — Answers: Q1:A (1s tick), Q2:C (fast, 5+/tick), Q3:A (Feed -15 Hunger), Q4:B (Play: Happiness+20/Hunger+15/Energy-15), Q5:B (timed Resting state, Feed/Play disabled during), Q6:B (5s cooldown), Q7:A (Health declines if Hunger>=80 OR Happiness<=20 OR Energy<=20), Q8:A (starting stats: Hunger10/Happiness80/Energy80/Health100), Q9:A (decomposed components: PetDisplay/StatBar/ActionPanel).
+**AI Response**: "No vague/ambiguous answers detected (all clear letter picks). Identified and documented a non-blocking balance caveat: DECAY_PER_TICK=5 at 1s ticks outpaces FEED_HUNGER_DELTA=-15 on a 5s cooldown, so Hunger trends upward even under optimal play - flagged in business-rules.md as a tunable-constants note rather than reopening questions. Generated business-logic-model.md, business-rules.md, domain-entities.md, and frontend-components.md under aidlc-docs/construction/virtual-pet-web-app/functional-design/. All design-plan checkboxes marked complete."
+**Context**: Functional Design stage (unit: virtual-pet-web-app), Steps 5-7 complete. Presenting completion message, awaiting approval.
+
+---

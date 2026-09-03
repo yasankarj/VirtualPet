@@ -4,7 +4,7 @@
 - **Project Name**: Virtual Pet (Tamagotchi)
 - **Project Type**: Greenfield
 - **Start Date**: 2026-09-03T00:00:00Z
-- **Current Stage**: INCEPTION - Workflow Planning
+- **Current Stage**: CONSTRUCTION - Functional Design (unit: virtual-pet-web-app)
 
 ## Workspace State
 - **Existing Code**: No
@@ -33,12 +33,12 @@
 - [x] Workspace Detection - COMPLETE (Greenfield)
 - [x] Requirements Analysis - COMPLETE
 - [x] User Stories - SKIPPED (user approved recommendation; single user type, simple well-understood flow)
-- [x] Workflow Planning - COMPLETE (execution-plan.md created, pending approval)
-- [ ] Application Design - SKIP (rationale in execution-plan.md)
-- [ ] Units Generation - SKIP (rationale in execution-plan.md)
+- [x] Workflow Planning - COMPLETE (approved)
+- [x] Application Design - SKIPPED (rationale in execution-plan.md)
+- [x] Units Generation - SKIPPED (rationale in execution-plan.md)
 
 ### 🟢 CONSTRUCTION PHASE (Unit: virtual-pet-web-app)
-- [ ] Functional Design - EXECUTE
+- [ ] Functional Design - IN PROGRESS
 - [ ] NFR Requirements - SKIP
 - [ ] NFR Design - SKIP
 - [ ] Infrastructure Design - SKIP
@@ -49,7 +49,7 @@
 - [ ] Operations - PLACEHOLDER
 
 ## Current Status
-- **Lifecycle Phase**: INCEPTION
-- **Current Stage**: Workflow Planning Complete
-- **Next Stage**: Functional Design (unit: virtual-pet-web-app) — pending user approval of execution plan
-- **Status**: Awaiting user approval
+- **Lifecycle Phase**: CONSTRUCTION
+- **Current Stage**: Functional Design (unit: virtual-pet-web-app)
+- **Next Stage**: Code Generation
+- **Status**: In progress
