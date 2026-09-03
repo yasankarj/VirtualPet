@@ -100,10 +100,12 @@ Player-reported: Hunger decay can resume almost immediately after Feeding becaus
 - [x] NFR Design - SKIP (NFR Requirements skipped)
 - [x] Infrastructure Design - SKIP (client-side only)
 - [x] Code Generation - COMPLETE (approved) — `types.ts`/`constants.ts`/`factory.ts`/`rules.ts`/`persistence.ts`/`App.tsx` modified; 6 test files updated/added; 54/54 tests pass, build succeeds, live browser smoke test confirms the pacing fix
-- [x] Build and Test - COMPLETE — 54/54 unit tests pass, build succeeds, 3/3 integration scenarios pass including a new old-`.v1`-save fallback check; one test-fixture gap fixed (`rules.property.test.ts` missing `graces`)
+- [x] Build and Test - COMPLETE (approved) — 54/54 unit tests pass, build succeeds, 3/3 integration scenarios pass including a new old-`.v1`-save fallback check; one test-fixture gap fixed (`rules.property.test.ts` missing `graces`)
 
 ### Current Status
-- **Current Stage**: Build and Test — COMPLETE, awaiting final approval
-- **Next Stage**: None further defined (Operations remains a placeholder) — Decay Pacing change complete pending user approval
+- **Lifecycle Phase**: OPERATIONS (placeholder)
+- **Current Stage**: Operations - PLACEHOLDER
+- **Next Stage**: None — Decay Pacing change COMPLETE through Build and Test; committed and pushed to origin/main (b8e3d11)
+- **Status**: Complete (INCEPTION + CONSTRUCTION for this change); OPERATIONS is a placeholder with no further action defined
 - **Artifacts**: `aidlc-docs/inception/requirements/hunger-decay-pacing-questions.md`, `aidlc-docs/inception/requirements/hunger-decay-pacing-clarification-questions.md`, `aidlc-docs/inception/requirements/hunger-decay-pacing-requirements.md`, `aidlc-docs/inception/plans/hunger-decay-pacing-execution-plan.md`, `aidlc-docs/construction/plans/hunger-decay-pacing-functional-design-plan.md`, `aidlc-docs/construction/plans/hunger-decay-pacing-code-generation-plan.md`, updated functional-design docs, updated `src/domain/*` + `src/App.tsx` + tests, updated `aidlc-docs/construction/build-and-test/*`
 - **Artifacts**: `aidlc-docs/inception/requirements/hunger-feed-rebalance-questions.md`, `aidlc-docs/inception/requirements/hunger-feed-rebalance-requirements.md`, `aidlc-docs/inception/plans/hunger-feed-rebalance-execution-plan.md`, `aidlc-docs/construction/plans/hunger-feed-rebalance-functional-design-plan.md`, `aidlc-docs/construction/plans/hunger-feed-rebalance-code-generation-plan.md`, updated functional-design docs, updated `src/domain/{constants,rules}.ts` + tests, updated `aidlc-docs/construction/build-and-test/*`
