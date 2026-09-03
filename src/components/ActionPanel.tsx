@@ -1,11 +1,15 @@
+import { STAT_MAX, STAT_MIN } from "../domain/constants";
+
 interface ActionPanelProps {
   onFeed: () => void;
   onPlay: () => void;
   onRest: () => void;
-  feedRemainingMs: number;
-  playRemainingMs: number;
   isResting: boolean;
   restRemainingMs: number;
+  hunger: number;
+  happiness: number;
+  energy: number;
+  health: number;
 }
 
 function secondsCeil(ms: number): number {
@@ -16,13 +20,16 @@ export function ActionPanel({
   onFeed,
   onPlay,
   onRest,
-  feedRemainingMs,
-  playRemainingMs,
   isResting,
   restRemainingMs,
+  hunger,
+  happiness,
+  energy,
+  health,
 }: ActionPanelProps) {
-  const feedDisabled = feedRemainingMs > 0 || isResting;
-  const playDisabled = playRemainingMs > 0 || isResting;
+  const feedDisabled = isResting || hunger <= STAT_MIN;
+  const playDisabled =
+    isResting || happiness >= STAT_MAX || energy <= STAT_MIN || health <= STAT_MIN;
   const restDisabled = isResting;
 
   return (
@@ -33,7 +40,7 @@ export function ActionPanel({
         disabled={feedDisabled}
         onClick={onFeed}
       >
-        {feedRemainingMs > 0 ? `Feed (${secondsCeil(feedRemainingMs)}s)` : "Feed"}
+        Feed
       </button>
       <button
         type="button"
@@ -41,7 +48,7 @@ export function ActionPanel({
         disabled={playDisabled}
         onClick={onPlay}
       >
-        {playRemainingMs > 0 ? `Play (${secondsCeil(playRemainingMs)}s)` : "Play"}
+        Play
       </button>
       <button
         type="button"

@@ -159,3 +159,65 @@
 **Context**: Build and Test stage COMPLETE. CONSTRUCTION PHASE COMPLETE. Moving to OPERATIONS PHASE (placeholder).
 
 ---
+
+## Change Request - Business Rule Adjustments (Feed/Play/Rest)
+**Timestamp**: 2026-09-03T05:53:51Z
+**User Input**: "I need few chage request to be made.
+1. Hunger should be able to reduce 0 before disble the action.
+2. The hunger decay rate and the feeding delay are equal at the moment. Because of that when the hunger is 100 the player stuck in feeding loop. This shold be adjusted.
+3. Play should be enable until happiness 100 percent or energy 0 or health 0.
+4. Dealy should only apply for rest."
+**AI Response**: "Treated as a brownfield change request against the existing virtual-pet-web-app unit. Requirements are concrete enough to skip a clarifying-question file (minimal-depth Requirements Analysis per process-overview.md adaptive principle); interpreted intent as: (1) disable Feed only when hunger has reached STAT_MIN (0); (2)+(4) remove the Feed/Play cooldown (ACTION_COOLDOWN_MS) entirely — the documented Balance Caveat in business-rules.md was caused by DECAY_PER_TICK*ticks-per-cooldown roughly offsetting FEED_HUNGER_DELTA, and removing the cooldown (so 'delay' applies only to Rest) resolves it structurally rather than by re-tuning magic numbers; (3) disable Play when happiness>=STAT_MAX (100) OR energy<=STAT_MIN (0) OR health<=STAT_MIN (0). Presented a Code Generation plan (Part 1) for approval before touching code."
+**Context**: Construction Phase, Code Generation (change request against unit: virtual-pet-web-app). Gate: awaiting explicit plan approval before Part 2 (code generation).
+
+---
+
+## Change Request Plan - Revised (cooldown kept, shortened)
+**Timestamp**: 2026-09-03T05:53:51Z
+**User Input**: Selected "Approve, but keep some delay on Feed/Play" (not full removal), then for the follow-up on new cooldown length selected "2000ms (2 ticks)".
+**AI Response**: "Final plan: (1) Feed disabled when hunger<=STAT_MIN(0), in addition to existing cooldown/resting checks; (2) ACTION_COOLDOWN_MS lowered from 5000ms to 2000ms for both Feed and Play — during a 2-tick cooldown decay adds +10 hunger vs Feed's -15, netting -5/cycle so hunger no longer drifts to 100 under optimal play (previously +25 decay vs -15 feed = +10/cycle, the reported bug); (3) Play disabled when happiness>=STAT_MAX(100) OR energy<=STAT_MIN(0) OR health<=STAT_MIN(0), in addition to existing cooldown/resting checks; (4) Rest's own delay (REST_DURATION_MS) is unchanged — this was already the only 'sleep' delay in the game, the shortened ACTION_COOLDOWN_MS is a distinct, separately-tunable delay for Feed/Play as before. Proceeding to Part 2 (code generation) against this plan."
+**Context**: Construction Phase, Code Generation (change request). Plan approved via follow-up clarification; proceeding to implementation.
+
+---
+
+## Change Request - Implementation Complete
+**Timestamp**: 2026-09-03T05:53:51Z
+**User Input**: N/A (implementation turn)
+**AI Response**: "Implemented all 4 rule changes: applyFeed/applyPlay preconditions updated in rules.ts, ACTION_COOLDOWN_MS lowered to 2000ms in constants.ts, ActionPanel/App wired with hunger/happiness/energy/health props for the new disable conditions. Updated tests (rules.test.ts, ActionPanel.test.tsx) with boundary-condition cases. Updated functional-design docs (business-rules.md incl. replacing the old Balance Caveat with a Balance Fix note, frontend-components.md, business-logic-model.md) and code summaries. Ran `npm test` (48/48 passing) and `npm run build` (clean, no type errors). Updated aidlc-state.md with a Change Requests log entry. Presenting completion message, awaiting approval."
+**Context**: Construction Phase, Code Generation (change request) COMPLETE. Gate: awaiting explicit user approval.
+
+---
+
+## Change Request #2 - Feed/Hunger/Energy Rework
+**Timestamp**: 2026-09-03T06:04:08Z
+**User Input**: "I need more change request. Please follow workflow when made change request.
+1. Feed does not need a delay. Hunger should reduce only when play or when do not fed over a long time period.
+2. When fed energy should increase."
+**AI Response**: "This is a Requirements Analysis stage with genuine ambiguity (exact 'long time period' duration and rate for the neglect mechanic, whether Play's cooldown is also affected, and the Feed energy-gain magnitude are all unspecified). Per the user's explicit instruction to follow workflow, and per common/question-format-guide.md ('Never ask questions in chat... ALL questions must be placed in dedicated question files'), created aidlc-docs/inception/requirements/change-request-2-clarification-questions.md with 5 multiple-choice questions instead of asking inline. Waiting for user answers before proceeding to a Code Generation plan."
+**Context**: Requirements Analysis (change request #2). Gate: awaiting user answers in change-request-2-clarification-questions.md.
+
+---
+
+## Change Request #2 - Answers Received, Contradiction Detected
+**Timestamp**: 2026-09-03T06:10:00Z
+**User Input**: "done, answered all the questions" — with answers in change-request-2-clarification-questions.md: Q1=B (remove Play's cooldown too), Q2=C/Other "Keep per tick decay for all", Q3=C (30 seconds), Q4=B (+2/tick gentler rate), Q5=B (+10 Energy per Feed).
+**AI Response**: "Q1, Q3, Q4, Q5 are clear and consistent. Q2's answer ('Keep per tick decay for all') contradicts the original request and Q3/Q4: if Hunger keeps its automatic per-tick rise 'for all' (literally, including Hunger), the neglect mechanic from Q3/Q4 (30s threshold, +2/tick after) would be unreachable/pointless. Per question-format-guide.md mandatory contradiction detection, created change-request-2-clarification-questions-followup.md with 1 targeted question to resolve whether Q2 meant 'Happiness/Energy only' (keeping the neglect mechanic) or literally 'all four stats including Hunger' (dropping the neglect mechanic). Not proceeding to a plan until resolved."
+**Context**: Requirements Analysis (change request #2). Gate: awaiting user answer to the follow-up contradiction question.
+
+---
+
+## Change Request #2 - Contradiction Resolved, Plan Approved
+**Timestamp**: 2026-09-03T06:14:30Z
+**User Input**: "Answer B" (to the follow-up: keep Hunger's automatic per-tick rise exactly as today; drop the neglect mechanic) — then "Continue" to approve the presented Code Generation plan.
+**AI Response**: "Final scope: (1) remove cooldown mechanic entirely from Feed and Play (ActionCooldowns/cooldowns field removed from PetState; only Rest's REST_DURATION_MS remains a timed delay); (2) Hunger's automatic per-tick rise unchanged, no neglect mechanic; (3) new FEED_ENERGY_DELTA=+10 applied by Feed. Existing CR1 boundary-disable rules (Feed at hunger=0; Play at happiness=100/energy=0/health=0) retained, just without the cooldown check. No storage version bump. Plan approved by user; proceeding to Part 2 (code generation)."
+**Context**: Construction Phase, Code Generation (change request #2). Plan approved; proceeding to implementation.
+
+---
+
+## Change Request #2 - Implementation Complete
+**Timestamp**: 2026-09-03T06:19:07Z
+**User Input**: N/A (implementation turn)
+**AI Response**: "Removed ActionCooldowns/cooldowns entirely (types.ts, factory.ts, persistence.ts), removed ACTION_COOLDOWN_MS and applyCooldownCountdown (constants.ts, rules.ts), removed the cooldown countdown step from tick(). applyFeed/applyPlay no longer check a cooldown; applyFeed now also raises energy by new FEED_ENERGY_DELTA=+10. ActionPanel/App updated: cooldown props and countdown text removed for Feed/Play (Rest countdown untouched). Updated tests (rules.test.ts, rules.property.test.ts, persistence.property.test.ts, ActionPanel.test.tsx) to match. Updated all 4 functional-design docs and both code summaries to reflect the removed cooldown mechanic, the new Feed energy effect, and the persisted-shape change (cooldowns field dropped, no version bump needed — old data still loads fine with the extra field ignored). Ran `npm test` (43/43 passing) and `npm run build` (clean). Presenting completion message, awaiting approval."
+**Context**: Construction Phase, Code Generation (change request #2) COMPLETE. Gate: awaiting explicit user approval.
+
+---

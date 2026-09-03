@@ -6,6 +6,5 @@ export function createNewPet(): PetState {
     stats: { ...NEW_PET_STARTING_STATS },
     isResting: false,
     restRemainingMs: 0,
-    cooldowns: { feedRemainingMs: 0, playRemainingMs: 0 },
   };
 }

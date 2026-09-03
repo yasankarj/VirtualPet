@@ -3,12 +3,12 @@ import {
   STAT_MAX,
   DECAY_PER_TICK,
   FEED_HUNGER_DELTA,
+  FEED_ENERGY_DELTA,
   PLAY_HAPPINESS_DELTA,
   PLAY_HUNGER_DELTA,
   PLAY_ENERGY_DELTA,
   REST_DURATION_MS,
   REST_ENERGY_REGEN_PER_TICK,
-  ACTION_COOLDOWN_MS,
   TICK_INTERVAL_MS,
   HEALTH_DECLINE_PER_TICK,
   HEALTH_RECOVERY_PER_TICK,
@@ -88,43 +88,46 @@ export function applyRestTick(state: PetState): PetState {
   };
 }
 
-/** Cooldown Countdown Rule: Feed/Play cooldowns tick down every tick regardless of resting state. */
-export function applyCooldownCountdown(state: PetState): PetState {
-  return {
-    ...state,
-    cooldowns: {
-      feedRemainingMs: Math.max(0, state.cooldowns.feedRemainingMs - TICK_INTERVAL_MS),
-      playRemainingMs: Math.max(0, state.cooldowns.playRemainingMs - TICK_INTERVAL_MS),
-    },
-  };
-}
-
 /**
- * Tick Process (business-logic-model.md #1): decay -> rest tick -> cooldown countdown -> recompute health.
+ * Tick Process (business-logic-model.md #1): decay -> rest tick -> recompute health.
  * Runs once per TICK_INTERVAL_MS while the app is open.
  */
 export function tick(state: PetState): PetState {
   let next = applyDecay(state);
   next = applyRestTick(next);
-  next = applyCooldownCountdown(next);
   next = { ...next, stats: { ...next.stats, health: computeHealth(next.stats) } };
   return next;
 }
 
-/** Feed Action: no-op (defensive) if on cooldown or resting. */
+/** Feed Action: no-op (defensive) if resting or hunger is already fully satisfied. No cooldown. */
 export function applyFeed(state: PetState): PetState {
-  if (state.cooldowns.feedRemainingMs > 0 || state.isResting) return state;
+  if (state.isResting || state.stats.hunger <= STAT_MIN) {
+    return state;
+  }
 
   return {
     ...state,
-    stats: { ...state.stats, hunger: clamp(state.stats.hunger + FEED_HUNGER_DELTA) },
-    cooldowns: { ...state.cooldowns, feedRemainingMs: ACTION_COOLDOWN_MS },
+    stats: {
+      ...state.stats,
+      hunger: clamp(state.stats.hunger + FEED_HUNGER_DELTA),
+      energy: clamp(state.stats.energy + FEED_ENERGY_DELTA),
+    },
   };
 }
 
-/** Play Action: no-op (defensive) if on cooldown or resting. */
+/**
+ * Play Action: no-op (defensive) if resting, happiness is already maxed, or the pet has no
+ * energy/health left to play with. No cooldown.
+ */
 export function applyPlay(state: PetState): PetState {
-  if (state.cooldowns.playRemainingMs > 0 || state.isResting) return state;
+  if (
+    state.isResting ||
+    state.stats.happiness >= STAT_MAX ||
+    state.stats.energy <= STAT_MIN ||
+    state.stats.health <= STAT_MIN
+  ) {
+    return state;
+  }
 
   return {
     ...state,
@@ -134,7 +137,6 @@ export function applyPlay(state: PetState): PetState {
       hunger: clamp(state.stats.hunger + PLAY_HUNGER_DELTA),
       energy: clamp(state.stats.energy + PLAY_ENERGY_DELTA),
     },
-    cooldowns: { ...state.cooldowns, playRemainingMs: ACTION_COOLDOWN_MS },
   };
 }
 

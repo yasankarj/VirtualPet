@@ -16,10 +16,6 @@ const petStateArb: fc.Arbitrary<PetState> = fc.record({
   }),
   isResting: fc.boolean(),
   restRemainingMs: msArb,
-  cooldowns: fc.record({
-    feedRemainingMs: msArb,
-    playRemainingMs: msArb,
-  }),
 });
 
 type Op = "tick" | "feed" | "play" | "rest";

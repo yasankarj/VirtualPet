@@ -16,10 +16,6 @@ const petStateArb: fc.Arbitrary<PetState> = fc.record({
   }),
   isResting: fc.boolean(),
   restRemainingMs: msArb,
-  cooldowns: fc.record({
-    feedRemainingMs: msArb,
-    playRemainingMs: msArb,
-  }),
 });
 
 describe("property: save/load round-trip", () => {

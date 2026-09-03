@@ -7,6 +7,7 @@ export const TICK_INTERVAL_MS = 1000;
 export const DECAY_PER_TICK = 5;
 
 export const FEED_HUNGER_DELTA = -15;
+export const FEED_ENERGY_DELTA = 10;
 
 export const PLAY_HAPPINESS_DELTA = 20;
 export const PLAY_HUNGER_DELTA = 15;
@@ -14,8 +15,6 @@ export const PLAY_ENERGY_DELTA = -15;
 
 export const REST_DURATION_MS = 10000;
 export const REST_ENERGY_REGEN_PER_TICK = 5;
-
-export const ACTION_COOLDOWN_MS = 5000;
 
 export const HEALTH_DECLINE_PER_TICK = DECAY_PER_TICK;
 export const HEALTH_RECOVERY_PER_TICK = 2;

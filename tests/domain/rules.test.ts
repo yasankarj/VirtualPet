@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  applyCooldownCountdown,
   applyFeed,
   applyPlay,
   applyRest,
@@ -9,7 +8,7 @@ import {
   computeMood,
 } from "../../src/domain/rules";
 import {
-  ACTION_COOLDOWN_MS,
+  FEED_ENERGY_DELTA,
   FEED_HUNGER_DELTA,
   PLAY_ENERGY_DELTA,
   PLAY_HAPPINESS_DELTA,
@@ -30,39 +29,48 @@ function state(overrides: Partial<PetState> = {}): PetState {
 }
 
 describe("applyFeed", () => {
-  it("decreases hunger and sets the feed cooldown", () => {
-    const result = applyFeed(state({ stats: stats({ hunger: 50 }) }));
+  it("decreases hunger and increases energy, with no cooldown", () => {
+    const result = applyFeed(state({ stats: stats({ hunger: 50, energy: 50 }) }));
     expect(result.stats.hunger).toBe(50 + FEED_HUNGER_DELTA);
-    expect(result.cooldowns.feedRemainingMs).toBe(ACTION_COOLDOWN_MS);
-  });
-
-  it("is a no-op while on cooldown", () => {
-    const s = state({ cooldowns: { feedRemainingMs: 1000, playRemainingMs: 0 } });
-    expect(applyFeed(s)).toEqual(s);
+    expect(result.stats.energy).toBe(50 + FEED_ENERGY_DELTA);
   });
 
   it("is a no-op while resting", () => {
     const s = state({ isResting: true });
+    expect(applyFeed(s)).toEqual(s);
+  });
+
+  it("is a no-op once hunger has reached 0", () => {
+    const s = state({ stats: stats({ hunger: 0 }) });
     expect(applyFeed(s)).toEqual(s);
   });
 });
 
 describe("applyPlay", () => {
-  it("adjusts happiness, hunger, and energy, and sets the play cooldown", () => {
+  it("adjusts happiness, hunger, and energy, with no cooldown", () => {
     const result = applyPlay(state({ stats: stats({ happiness: 50, hunger: 50, energy: 50 }) }));
     expect(result.stats.happiness).toBe(50 + PLAY_HAPPINESS_DELTA);
     expect(result.stats.hunger).toBe(50 + PLAY_HUNGER_DELTA);
     expect(result.stats.energy).toBe(50 + PLAY_ENERGY_DELTA);
-    expect(result.cooldowns.playRemainingMs).toBe(ACTION_COOLDOWN_MS);
-  });
-
-  it("is a no-op while on cooldown", () => {
-    const s = state({ cooldowns: { feedRemainingMs: 0, playRemainingMs: 1000 } });
-    expect(applyPlay(s)).toEqual(s);
   });
 
   it("is a no-op while resting", () => {
     const s = state({ isResting: true });
+    expect(applyPlay(s)).toEqual(s);
+  });
+
+  it("is a no-op once happiness has reached 100", () => {
+    const s = state({ stats: stats({ happiness: 100 }) });
+    expect(applyPlay(s)).toEqual(s);
+  });
+
+  it("is a no-op once energy has reached 0", () => {
+    const s = state({ stats: stats({ energy: 0 }) });
+    expect(applyPlay(s)).toEqual(s);
+  });
+
+  it("is a no-op once health has reached 0", () => {
+    const s = state({ stats: stats({ health: 0 }) });
     expect(applyPlay(s)).toEqual(s);
   });
 });
@@ -97,15 +105,6 @@ describe("applyRest / applyRestTick", () => {
   it("is a no-op if not resting", () => {
     const s = state({ isResting: false });
     expect(applyRestTick(s)).toEqual(s);
-  });
-});
-
-describe("applyCooldownCountdown", () => {
-  it("counts down both cooldowns without going below zero", () => {
-    const s = state({ cooldowns: { feedRemainingMs: 1500, playRemainingMs: 500 } });
-    const result = applyCooldownCountdown(s);
-    expect(result.cooldowns.feedRemainingMs).toBe(500);
-    expect(result.cooldowns.playRemainingMs).toBe(0);
   });
 });
 

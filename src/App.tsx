@@ -36,10 +36,12 @@ function App() {
         onFeed={() => setPetState((current) => applyFeed(current))}
         onPlay={() => setPetState((current) => applyPlay(current))}
         onRest={() => setPetState((current) => applyRest(current))}
-        feedRemainingMs={petState.cooldowns.feedRemainingMs}
-        playRemainingMs={petState.cooldowns.playRemainingMs}
         isResting={petState.isResting}
         restRemainingMs={petState.restRemainingMs}
+        hunger={petState.stats.hunger}
+        happiness={petState.stats.happiness}
+        energy={petState.stats.energy}
+        health={petState.stats.health}
       />
     </div>
   );

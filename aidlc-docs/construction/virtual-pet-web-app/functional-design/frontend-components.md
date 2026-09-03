@@ -15,7 +15,7 @@ App
 - **Game loop**: `App` runs one `useEffect` with `setInterval(tick, TICK_INTERVAL_MS)`, cleared on unmount. Each tick calls the tick-process logic (business-logic-model.md #1) and calls `setPetState`.
 - **Actions**: `App` defines `handleFeed`, `handlePlay`, `handleRest` callbacks (each validates preconditions, applies the relevant rule, calls `setPetState`) and passes them down to `ActionPanel`.
 - **Persistence**: a `useEffect` on `petState` change writes to `localStorage` (business-logic-model.md #6 save path); initial state is read synchronously via `useState(() => loadFromStorage())` (lazy initializer) so there's no flash of default values before the saved pet loads.
-- **Derived values** (mood, cooldown-remaining display, "is action available" booleans) are computed inline from `petState` on each render — not stored as separate state, since they're pure functions of it.
+- **Derived values** (mood, Rest countdown display, "is action available" booleans) are computed inline from `petState` on each render — not stored as separate state, since they're pure functions of it.
 
 ## Components
 
@@ -34,10 +34,11 @@ App
 - Reused 4 times in `App` (Hunger, Happiness, Energy, Health).
 
 ### `ActionPanel`
-- **Props**: `{ onFeed: () => void, onPlay: () => void, onRest: () => void, feedRemainingMs: number, playRemainingMs: number, isResting: boolean, restRemainingMs: number }`
+- **Props**: `{ onFeed: () => void, onPlay: () => void, onRest: () => void, isResting: boolean, restRemainingMs: number, hunger: number, happiness: number, energy: number, health: number }`
 - **Renders**: three buttons (Feed, Play, Rest).
-  - Feed/Play: `disabled` when their respective `*RemainingMs > 0` **or** `isResting === true`; shows a countdown (e.g. "Feed (3s)") while disabled.
-  - Rest: `disabled` when `isResting === true`; while resting, shows a countdown to wake (e.g. "Sleeping... 7s").
+  - Feed: `disabled` when `isResting === true` **or** `hunger <= STAT_MIN` (already fully satisfied). No cooldown (CR#2, 2026-09-03) — label is always just "Feed".
+  - Play: `disabled` when `isResting === true` **or** `happiness >= STAT_MAX` **or** `energy <= STAT_MIN` **or** `health <= STAT_MIN`. No cooldown (CR#2) — label is always just "Play".
+  - Rest: `disabled` when `isResting === true`; while resting, shows a countdown to wake (e.g. "Sleeping... 7s"). Rest is the only button with a timed delay.
 - **User interactions**: clicking an enabled button calls the corresponding `on*` callback; disabled buttons are inert (no click handler fires) — this is the UI-level enforcement backing the "defensive no-op" rule in business-logic-model.md.
 
 ## Form Validation

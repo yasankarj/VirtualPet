@@ -12,10 +12,12 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof ActionPanel>
       onFeed={onFeed}
       onPlay={onPlay}
       onRest={onRest}
-      feedRemainingMs={0}
-      playRemainingMs={0}
       isResting={false}
       restRemainingMs={0}
+      hunger={50}
+      happiness={50}
+      energy={50}
+      health={50}
       {...overrides}
     />,
   );
@@ -29,20 +31,6 @@ describe("ActionPanel", () => {
     expect(onFeed).toHaveBeenCalledOnce();
   });
 
-  it("disables Feed and shows a countdown while on cooldown", () => {
-    renderPanel({ feedRemainingMs: 3000 });
-    const button = screen.getByTestId("action-panel-feed-button");
-    expect(button).toBeDisabled();
-    expect(button).toHaveTextContent("Feed (3s)");
-  });
-
-  it("disables Play and shows a countdown while on cooldown", () => {
-    renderPanel({ playRemainingMs: 4000 });
-    const button = screen.getByTestId("action-panel-play-button");
-    expect(button).toBeDisabled();
-    expect(button).toHaveTextContent("Play (4s)");
-  });
-
   it("disables Feed and Play while resting, and shows the sleep countdown on Rest", () => {
     renderPanel({ isResting: true, restRemainingMs: 7000 });
     expect(screen.getByTestId("action-panel-feed-button")).toBeDisabled();
@@ -50,5 +38,25 @@ describe("ActionPanel", () => {
     const restButton = screen.getByTestId("action-panel-rest-button");
     expect(restButton).toBeDisabled();
     expect(restButton).toHaveTextContent("Sleeping... 7s");
+  });
+
+  it("disables Feed once hunger has reached 0", () => {
+    renderPanel({ hunger: 0 });
+    expect(screen.getByTestId("action-panel-feed-button")).toBeDisabled();
+  });
+
+  it("disables Play once happiness has reached 100", () => {
+    renderPanel({ happiness: 100 });
+    expect(screen.getByTestId("action-panel-play-button")).toBeDisabled();
+  });
+
+  it("disables Play once energy has reached 0", () => {
+    renderPanel({ energy: 0 });
+    expect(screen.getByTestId("action-panel-play-button")).toBeDisabled();
+  });
+
+  it("disables Play once health has reached 0", () => {
+    renderPanel({ health: 0 });
+    expect(screen.getByTestId("action-panel-play-button")).toBeDisabled();
   });
 });
